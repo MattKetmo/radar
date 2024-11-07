@@ -1,6 +1,7 @@
 import { Alert } from "@/types/alertmanager"
 import { formatDate } from "@/lib/date"
 import { stringToColor } from "./utils"
+import { cn } from "@/lib/utils"
 
 const importantLabels = [
   'host',
@@ -18,13 +19,16 @@ const importantLabels = [
 
 type Props = {
   alert: Alert
+  isSelected: boolean
 }
 
 export function AlertRow(props: Props) {
-  const { alert } = props
+  const { alert, isSelected } = props
 
   return (
-    <div className="flex gap-2 items-center px-6 h-[45px] border-b group cursor-pointer">
+    <div className={cn("flex gap-2 items-center border-l-4 border-l-transparent px-2 h-[45px] border-b group cursor-pointer",
+      isSelected && "border-l-blue-500",
+    )}>
       <AlertSeverity alert={alert} />
       <AlertTitle alert={alert} />
       <AlertSummary alert={alert} />
@@ -105,7 +109,7 @@ function AlertLabels({ alert }: { alert: Alert }) {
             <button
               title={`${key}: ${value}`}
               className="text-xs bg-secondary px-2 py-1 items-center rounded-sm gap-1 flex hover:border-primary"
-              // className="text-xs border px-2  items-center rounded-full gap-2 flex hover:border-primary"
+            // className="text-xs border px-2  items-center rounded-full gap-2 flex hover:border-primary"
             >
               {/* {key === 'namespace' && (
                 <span className="h-2 w-2 block rounded-full" style={{backgroundColor: stringToColor(value)}}/>

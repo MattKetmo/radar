@@ -16,11 +16,12 @@ import { Group } from "./types"
 
 type AlertGroupsProps = {
   alertGroups: Group[]
+  selectedAlert: Alert | null,
   setSelectedAlert: (alert: Alert | null) => void
 }
 
 export function AlertGroups(props: AlertGroupsProps) {
-  const { alertGroups, setSelectedAlert } = props
+  const { alertGroups, selectedAlert, setSelectedAlert } = props
 
   return (
     <div>
@@ -28,6 +29,7 @@ export function AlertGroups(props: AlertGroupsProps) {
         <AlertGroup
           key={alertGroup.name}
           alertGroup={alertGroup}
+          selectedAlert={selectedAlert}
           setSelectedAlert={setSelectedAlert}
         />
       ))}
@@ -37,11 +39,12 @@ export function AlertGroups(props: AlertGroupsProps) {
 
 type AlertGroupProps = {
   alertGroup: Group
+  selectedAlert: Alert | null,
   setSelectedAlert: (alert: Alert | null) => void
 }
 
 function AlertGroup(props: AlertGroupProps) {
-  const { alertGroup, setSelectedAlert } = props
+  const { alertGroup, selectedAlert, setSelectedAlert } = props
   const { name, alerts } = alertGroup
   const [open, setOpen] = useState(true)
 
@@ -67,7 +70,7 @@ function AlertGroup(props: AlertGroupProps) {
                 exit={{ backgroundColor: 'yellow' }}
                 transition={{ duration: 1 }}
               >
-                <AlertRow alert={alert} />
+                <AlertRow alert={alert} isSelected={selectedAlert === alert} />
               </motion.li>
             ))}
           </AnimatePresence>

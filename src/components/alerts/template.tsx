@@ -79,6 +79,7 @@ export function AlertsTemplate(props: Props) {
       <div className="overflow-auto">
         <AlertGroups
           alertGroups={alertGroups}
+          selectedAlert={selectedAlert}
           setSelectedAlert={setSelectedAlert}
         />
 
