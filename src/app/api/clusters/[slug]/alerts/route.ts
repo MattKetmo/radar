@@ -1,10 +1,11 @@
-import { config } from "@/config";
+import { getConfig } from "@/config";
 
 export async function GET(
   _: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const cluster = (await params).slug
+  const config = await getConfig()
 
   const endpoint = config.clusters.find((c) => c.name === cluster)?.endpoint
   if (!endpoint) {

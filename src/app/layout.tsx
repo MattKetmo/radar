@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { clientConfig } from "@/config/client";
 import { ConfigProvider } from "@/contexts/config";
 import { ThemeProvider } from "next-themes";
 import { AppLayout } from "@/components/layout/app-layout";
 import { AlertsProvider } from "@/contexts/alerts";
+
+export const dynamic = "force-dynamic";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
   description: "Dashboard for AlertManager Prometheus",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -39,7 +40,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ConfigProvider config={clientConfig}>
+          <ConfigProvider>
             <AlertsProvider>
               <AppLayout>
                 {children}

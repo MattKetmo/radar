@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, ReactNode } from 'react'
+import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react'
 import { Config } from '@/config/types'
 
 interface ConfigContextProps {
@@ -9,7 +9,36 @@ interface ConfigContextProps {
 
 const ConfigContext = createContext<ConfigContextProps | undefined>(undefined)
 
-export const ConfigProvider = ({ children, config }: { children: ReactNode, config: Config }) => {
+export const ConfigProvider = ({ children }: { children: ReactNode }) => {
+  const [config, setConfig] = useState<Config | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await fetch('/api/config')
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+        const data = await response.json()
+        setConfig(data)
+      } catch (error) {
+        console.error('Failed to fetch config:', error)
+        setError("Failed to fetch config")
+      }
+    }
+
+    fetchConfig()
+  }, [])
+
+  if (error !== null) {
+    return <div>{error}</div>
+  }
+
+  if (config === null) {
+    return <div>Loading...</div>
+  }
+
   return (
     <ConfigContext.Provider value={{ config }}>
       {children}

@@ -10,7 +10,7 @@ import { AlertModal } from './alert-modal'
 import { LabelFilter, Group } from './types'
 import { useConfig } from '@/contexts/config'
 import { alertFilter, alertSort } from './utils'
-
+import { notFound } from 'next/navigation'
 
 type Props = {
   view: string
@@ -21,6 +21,10 @@ export function AlertsTemplate(props: Props) {
   const { config } = useConfig()
   const { alerts, loading, errors, refreshAlerts } = useAlerts()
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null)
+
+  if (!config.views[view]) {
+    return notFound()
+  }
 
   const { filters, groupBy } = config.views[view]
 
