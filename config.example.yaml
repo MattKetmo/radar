@@ -1,0 +1,48 @@
+---
+clusters:
+- name: my-prod-cluster
+  endpoint: http://localhost:9095
+  labels:
+    "@env": prod
+    "@provider": aws
+    "@region": eu-west-1
+
+# Views
+views:
+  default:
+    groupBy: "@cluster"
+    filters:
+    - label: severity
+      value:
+      - none
+      exclude: true
+  errors:
+    name: Errors
+    groupBy: "namespace"
+    filters:
+    - label: severity
+      value:
+      - warning
+      - info
+      - none
+      exclude: true
+  crashloop:
+    name: Kube Pod Crash Looping
+    groupBy: "@cluster"
+    filters:
+    - label: alertname
+      value:
+      - KubePodCrashLooping
+  info:
+    name: Info
+    groupBy: "@cluster"
+    filters:
+    - label: severity
+      value:
+      - info
+      - none
+    - label: alertname
+      value:
+      - InfoInhibitor
+      - Watchdog
+      exclude: true
