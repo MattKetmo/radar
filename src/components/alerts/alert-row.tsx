@@ -1,7 +1,7 @@
 import { Alert } from "@/types/alertmanager"
 import { formatDate } from "@/lib/date"
 import { stringToColor } from "./utils"
-import { cn } from "@/lib/utils"
+import { AlertSeverity } from "./alert-severity"
 
 const importantLabels = [
   'host',
@@ -25,49 +25,13 @@ export function AlertRow(props: Props) {
   const { alert } = props
 
   return (
-    <div className="flex gap-2 items-center px-6 h-[45px] border-b group cursor-pointer">
+    <div className="flex gap-2 xl:gap-4 items-center px-6 h-[45px] border-b group cursor-pointer">
       <AlertSeverity alert={alert} />
       <AlertTitle alert={alert} />
       <AlertSummary alert={alert} />
       <div className="grow" />
       <AlertLabels alert={alert} />
       <AlertTime alert={alert} />
-    </div>
-  )
-}
-
-function AlertSeverity({ alert }: { alert: Alert }) {
-  const { severity } = alert.labels
-
-  let color = 'bg-black'
-  let text = '???'
-
-  switch (severity) {
-    case 'critical':
-      color = 'bg-red-600'
-      text = 'CRIT'
-      break
-    case 'error':
-      color = 'bg-red-500'
-      text = 'ERR'
-      break
-    case 'warning':
-      color = 'bg-orange-300'
-      text = 'WARN'
-      break
-    case 'info':
-      color = 'bg-blue-400'
-      text = 'INFO'
-      break
-    case 'none':
-      color = 'bg-slate-500'
-      text = 'NONE'
-      break
-  }
-
-  return (
-    <div className="shrink-0 w-12 font-mono">
-      <span className={cn("text-white text-xs px-2 py-1 rounded-sm", color)}>{text}</span>
     </div>
   )
 }
@@ -91,7 +55,6 @@ function AlertSummary({ alert }: { alert: Alert }) {
     </div>
   )
 }
-
 
 function AlertLabels({ alert }: { alert: Alert }) {
   const labels = Object.entries(alert.labels).map(([key, value]) => {
