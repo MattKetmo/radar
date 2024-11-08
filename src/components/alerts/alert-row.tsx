@@ -1,6 +1,7 @@
 import { Alert } from "@/types/alertmanager"
 import { formatDate } from "@/lib/date"
 import { stringToColor } from "./utils"
+import { cn } from "@/lib/utils"
 
 const importantLabels = [
   'host',
@@ -38,19 +39,35 @@ export function AlertRow(props: Props) {
 function AlertSeverity({ alert }: { alert: Alert }) {
   const { severity } = alert.labels
 
+  let color = 'bg-black'
+  let text = '???'
+
+  switch (severity) {
+    case 'critical':
+      color = 'bg-red-600'
+      text = 'CRIT'
+      break
+    case 'error':
+      color = 'bg-red-500'
+      text = 'ERR'
+      break
+    case 'warning':
+      color = 'bg-orange-300'
+      text = 'WARN'
+      break
+    case 'info':
+      color = 'bg-blue-400'
+      text = 'INFO'
+      break
+    case 'none':
+      color = 'bg-slate-500'
+      text = 'NONE'
+      break
+  }
+
   return (
     <div className="shrink-0 w-12 font-mono">
-      {severity === "critical" && (
-        <span className="bg-red-600 text-white text-xs px-2 py-1 rounded-sm">CRIT</span>
-      ) || severity === "error" && (
-        <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-sm">ERR</span>
-      ) || severity === "warning" && (
-        <span className="bg-orange-300 text-white text-xs px-2 py-1 rounded-sm">WARN</span>
-      ) || severity === "info" && (
-        <span className="bg-blue-400 text-white text-xs px-2 py-1 rounded-sm">INFO</span>
-      ) || (
-          <span className="bg-slate-500 text-white text-xs px-2 py-1 rounded-sm">NONE</span>
-        )}
+      <span className={cn("text-white text-xs px-2 py-1 rounded-sm", color)}>{text}</span>
     </div>
   )
 }
@@ -105,7 +122,7 @@ function AlertLabels({ alert }: { alert: Alert }) {
             <button
               title={`${key}: ${value}`}
               className="text-xs bg-secondary px-2 py-1 items-center rounded-sm gap-1 flex hover:border-primary"
-              // className="text-xs border px-2  items-center rounded-full gap-2 flex hover:border-primary"
+            // className="text-xs border px-2  items-center rounded-full gap-2 flex hover:border-primary"
             >
               {/* {key === 'namespace' && (
                 <span className="h-2 w-2 block rounded-full" style={{backgroundColor: stringToColor(value)}}/>
