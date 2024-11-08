@@ -48,11 +48,11 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader>
+      {/* <SidebarHeader>
         <div className="flex items-center justify-end">
           <SidebarTrigger />
         </div>
-      </SidebarHeader>
+      </SidebarHeader> */}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
