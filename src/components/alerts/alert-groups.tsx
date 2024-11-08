@@ -12,7 +12,6 @@ import { AlertRow } from "./alert-row"
 import { cn } from "@/lib/utils"
 import { Group } from "./types"
 
-
 type AlertGroupsProps = {
   alertGroups: Group[]
   setSelectedAlert: (alert: Alert | null) => void
@@ -47,7 +46,7 @@ function AlertGroup(props: AlertGroupProps) {
   return (
     <Collapsible defaultOpen={true} onOpenChange={setOpen}>
       <CollapsibleTrigger asChild>
-        <div className="sticky top-0 bg-accent group cursor-pointer h-[40px] px-6 text-sm flex items-center border-b">
+        <div className="sticky z-10 top-0 bg-accent group cursor-pointer h-[40px] px-6 text-sm flex items-center border-b">
           <AlertGroupHeader alertGroup={{ name, alerts }} open={open} />
         </div>
       </CollapsibleTrigger>
@@ -83,13 +82,15 @@ function AlertGroupHeader(props: AlertGroupHeaderProps) {
   const { name, alerts } = alertGroup
 
   return (
-    <div className="flex space-x-2 items-baseline w-full">
-      <span className="text-sm font-mono font-medium group-hover:underline">
-        {name}
-      </span>
-      <span className="text-xs text-slate-500">
-        {alerts.length}
-      </span>
+    <div className="flex space-x-2 items-center w-full">
+      <div className="flex items-baseline gap-2">
+        <span className="text-sm font-mono font-medium group-hover:underline">
+          {name}
+        </span>
+        <span className="text-xs text-slate-500">
+          {alerts.length}
+        </span>
+      </div>
       <div className="grow" />
       <div>
         <ChevronDown size={16} className={cn(

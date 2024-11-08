@@ -40,7 +40,7 @@ function AlertTitle({ alert }: { alert: Alert }) {
   const { alertname } = alert.labels
 
   return (
-    <div className="text-sm font-medium shrink-0 group-hover:text-blue-500 dark:group-hover:text-blue-300">
+    <div className="text-sm font-medium truncate min-w-[150px] group-hover:text-blue-500 dark:group-hover:text-blue-300">
       {alertname}
     </div>
   )
@@ -50,7 +50,7 @@ function AlertSummary({ alert }: { alert: Alert }) {
   const { summary } = alert.annotations
 
   return (
-    <div className="text-xs text-muted-foreground truncate">
+    <div className="text-xs text-muted-foreground truncate hidden sm:block">
       {summary}
     </div>
   )
@@ -75,7 +75,7 @@ function AlertLabels({ alert }: { alert: Alert }) {
   })
 
   return (
-    <div className="shrink truncate relative -mr-[0.2rem]">
+    <div className="shrink truncate relative -mr-[0.2rem] hidden sm:block">
       {/* {labels.length > 2 && (
         <div className="absolute top-0 right-0 bottom-0 w-[30px] bg-gradient-to-r from-transparent to-background" />
       )} */}

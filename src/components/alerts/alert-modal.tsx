@@ -43,14 +43,16 @@ export function AlertModal(props: Props) {
   return (
     <Sheet open={!!alert} onOpenChange={close}>
       {/* <SheetTrigger>Open</SheetTrigger> */}
-      <SheetContent>
+      <SheetContent className="w-screen">
         <div className="flex flex-col h-screen">
           <SheetHeader className="shrink-0">
             <SheetTitle className="flex gap-2 items-center">
               {alert && <AlertSeverity alert={alert} />}
               {alert?.labels.alertname}
             </SheetTitle>
-            <SheetDescription>{summary}</SheetDescription>
+            <SheetDescription className="text-left">
+              {summary}
+            </SheetDescription>
           </SheetHeader>
 
           <div className="overflow-auto pb-10">
