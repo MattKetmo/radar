@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from "framer-motion"
 import { useState } from "react"
 import { ChevronDown } from "lucide-react"
 
@@ -57,20 +56,17 @@ function AlertGroup(props: AlertGroupProps) {
         maxHeight: open ? `${alerts.length * 50}px` : '0',
       }}>
         <ul>
-          <AnimatePresence>
-            {alerts.map((alert: Alert) => (
-              <motion.li
-                key={alert.fingerprint}
-                onClick={() => setSelectedAlert(alert)}
-                initial={{ backgroundColor: 'yellow' }}
-                animate={{ backgroundColor: 'transparent' }}
-                exit={{ backgroundColor: 'yellow' }}
-                transition={{ duration: 1 }}
-              >
-                <AlertRow alert={alert} />
-              </motion.li>
-            ))}
-          </AnimatePresence>
+          {alerts.map((alert: Alert) => (
+            <li
+              key={alert.fingerprint}
+              onClick={() => setSelectedAlert(alert)}
+              className={cn({
+                'animate-highlight': new Date(alert.startsAt) > new Date(Date.now() - 30 * 60 * 1000)
+              })}
+            >
+              <AlertRow alert={alert} />
+            </li>
+          ))}
         </ul>
       </div>
     </Collapsible>

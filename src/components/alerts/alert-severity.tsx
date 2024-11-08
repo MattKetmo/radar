@@ -17,7 +17,7 @@ export function AlertSeverity({ alert }: { alert: Alert }) {
       text = 'ERR'
       break
     case 'warning':
-      color = 'bg-orange-300'
+      color = 'bg-orange-300 dark:text-black'
       text = 'WARN'
       break
     case 'info':
