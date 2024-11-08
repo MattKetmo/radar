@@ -1,0 +1,3 @@
+/* TEAM */
+Name: Matthieu Moquet
+Contact: matthieu [at] moquet [dot] net

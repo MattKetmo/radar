@@ -1,4 +1,4 @@
-import { config } from "."
+import { config } from "./server"
 
 // Remove the endpoints from the client config
 export const clientConfig = {
