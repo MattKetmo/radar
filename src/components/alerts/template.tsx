@@ -66,7 +66,7 @@ export function AlertsTemplate(props: Props) {
           </div>
           <div className="text-muted-foreground">/</div>
           <div>
-            {viewName ?? view}
+            {viewName ? viewName : view}
           </div>
           <div>
             {

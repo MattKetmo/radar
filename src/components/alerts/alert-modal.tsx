@@ -19,6 +19,7 @@ import {
 import { Alert } from "@/types/alertmanager"
 import { Check, ClipboardCopy, Square, SquareArrowOutUpRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { AlertSeverity } from "./alert-severity"
 
 function isURL(string: string): boolean {
   try {
@@ -45,7 +46,10 @@ export function AlertModal(props: Props) {
       <SheetContent>
         <div className="flex flex-col h-screen">
           <SheetHeader className="shrink-0">
-            <SheetTitle>{alert?.labels.alertname}</SheetTitle>
+            <SheetTitle className="flex gap-2 items-center">
+              {alert && <AlertSeverity alert={alert} />}
+              {alert?.labels.alertname}
+            </SheetTitle>
             <SheetDescription>{summary}</SheetDescription>
           </SheetHeader>
 
