@@ -4,13 +4,20 @@ import { Alert } from '@/types/alertmanager'
 import { useAlerts } from '@/contexts/alerts'
 import AppHeader from '@/components/layout/app-header'
 import { AlertGroups } from './alert-groups'
-import { RefreshCcw, TriangleAlert } from 'lucide-react'
+import { LoaderCircle, RefreshCcw, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
 import { AlertModal } from './alert-modal'
 import { LabelFilter, Group } from './types'
 import { useConfig } from '@/contexts/config'
 import { alertFilter, alertSort } from './utils'
 import { notFound } from 'next/navigation'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 type Props = {
   view: string
@@ -19,14 +26,14 @@ type Props = {
 export function AlertsTemplate(props: Props) {
   const { view } = props
   const { config } = useConfig()
-  const { alerts, loading, errors, refreshAlerts } = useAlerts()
+  const { alerts, loading, errors, refreshAlerts, refreshInterval, setRefreshInterval } = useAlerts()
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null)
 
   if (!config.views[view]) {
     return notFound()
   }
 
-  const { filters, groupBy } = config.views[view]
+  const { filters, groupBy, name: viewName } = config.views[view]
 
   // Flatten alerts
   const flattenedAlerts = Object.values(alerts).reduce((acc, val) => acc.concat(val), [])
@@ -53,30 +60,53 @@ export function AlertsTemplate(props: Props) {
   return (
     <div className="flex flex-col h-screen overflow-clip">
       <AppHeader>
-        <div className='flex items-center gap-2'>
-          <span className="font-medium">
+        <div className='flex items-center  gap-2'>
+          <div className="font-medium">
             Alerts
-          </span>
+          </div>
+          <div className="text-muted-foreground">/</div>
+          <div>
+            {viewName ?? view}
+          </div>
+          <div>
+            {
+              !loading && Object.entries(errors).length > 0 && (
+                <TriangleAlert
+                  size={16}
+                  className='text-orange-500'
+                />
+              )
+            }
+          </div>
 
-          {
-            loading && (
-              <span>loading…</span>
+          <div className='grow' />
+
+          <button
+            disabled={loading}
+            onClick={() => refreshAlerts()}
+            className={loading ? 'cursor-not-allowed text-muted-foreground ' : ''}
+          >
+            {loading && (
+              <LoaderCircle size={16} className='animate-[spin_1s]' />
             ) || (
-              <RefreshCcw
-                size={16}
-                className='cursor-pointer'
-                onClick={() => refreshAlerts()}
-              />
-            )
-          }
-          {
-            !loading && Object.entries(errors).length > 0 && (
-              <TriangleAlert
-                size={16}
-                className='text-orange-500'
-              />
-            )
-          }
+              <RefreshCcw size={16} />
+            )}
+          </button>
+
+          <div>
+            <Select value={`${refreshInterval}`} onValueChange={(value) => setRefreshInterval(Number(value))}>
+              <SelectTrigger className="w-[100px] h-[30px]">
+                <SelectValue placeholder="Refresh" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">Off</SelectItem>
+                <SelectItem value="5">5s</SelectItem>
+                <SelectItem value="10">10s</SelectItem>
+                <SelectItem value="30">30s</SelectItem>
+                <SelectItem value="60">60s</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </AppHeader>
 
@@ -95,6 +125,7 @@ export function AlertsTemplate(props: Props) {
                   Total of <span className="font-semibold">{filteredAlerts.length} alerts</span> displayed.
                 </span>
                 <button
+                  disabled={loading}
                   onClick={() => refreshAlerts()}
                   className="font-semibold hover:underline underline-offset-2"
                 >
