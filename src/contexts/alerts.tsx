@@ -10,6 +10,8 @@ interface AlertsContextProps {
   alerts: Record<string, Alert[]>
   errors: Record<string, string>
   loading: boolean
+  refreshInterval: number
+  setRefreshInterval: (interval: number) => void
   refreshAlerts: () => Promise<void>
 }
 
@@ -22,6 +24,7 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(false)
   const [alerts, setAlerts] = useState<Record<string, Alert[]>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [refreshInterval, setRefreshInterval] = useState<number>(30)
 
   const fetchAlertsForCluster = async (cluster: ClusterConfig) => {
     try {
@@ -78,12 +81,33 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false)
   }, [clusters])
 
+  // Refresh alerts on an interval
+  useEffect(() => {
+    if (refreshInterval === 0) return
+
+    const intervalId = setInterval(() => {
+      refreshAlerts()
+    }, refreshInterval * 1000)
+
+    return () => clearInterval(intervalId)
+  }, [refreshInterval, refreshAlerts])
+
+  // Fetch alerts on initial load
   useEffect(() => {
     refreshAlerts()
   }, [refreshAlerts])
 
+  const value = {
+    alerts,
+    errors,
+    loading,
+    refreshInterval,
+    setRefreshInterval,
+    refreshAlerts,
+  }
+
   return (
-    <AlertsContext.Provider value={{ alerts, errors, loading, refreshAlerts }}>
+    <AlertsContext.Provider value={value}>
       {children}
     </AlertsContext.Provider>
   )
