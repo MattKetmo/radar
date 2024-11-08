@@ -86,9 +86,9 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild>
                       <Link href={`/alerts/${handle}`}>
                         <SquareDot />
-                        <div className="flex items-baseline gap-2">
-                          <span className="shrink-0">{view.name || handle}</span>
-                          <span className="shrink-0 text-xs text-muted-foreground">
+                        <div className="flex items-baseline gap-2 w-full">
+                          <span className="shrink-0 grow">{view.name || handle}</span>
+                          <span className="shrink-0 text-xs text-muted-foreground bg-secondary p-1 w-6 text-center rounded-sm">
                             {flatAlerts.filter(alertFilter(view.filters)).length}
                           </span>
                         </div>

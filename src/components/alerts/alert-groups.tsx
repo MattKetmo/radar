@@ -87,7 +87,7 @@ function AlertGroupHeader(props: AlertGroupHeaderProps) {
         <span className="text-sm font-mono font-medium group-hover:underline">
           {name}
         </span>
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-slate-500 bg-secondary rounded-sm p-1 w-6 text-center">
           {alerts.length}
         </span>
       </div>
