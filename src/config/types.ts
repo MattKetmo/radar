@@ -8,11 +8,14 @@ const ClusterSchema = z.object({
   labels: z.record(z.string()),
 })
 
-export type ClusterConfig = z.infer<typeof ClusterSchema>
+export const ViewCategorySchema = z.object({
+  name: z.string(),
+})
 
 export const ViewsSchema = z.object({
   name: z.string().optional().default(''),
   groupBy: z.string(),
+  category: z.string().optional().default(''),
   filters: z.array(
     z.object({
       label: z.string(),
@@ -23,11 +26,13 @@ export const ViewsSchema = z.object({
   ),
 })
 
-export type ViewConfig = z.infer<typeof ViewsSchema>
-
 export const ConfigSchema = z.object({
   clusters: z.array(ClusterSchema),
+  viewCategories: z.record(ViewCategorySchema),
   views: z.record(ViewsSchema),
 })
 
+export type ClusterConfig = z.infer<typeof ClusterSchema>
+export type ViewCategoryConfig = z.infer<typeof ViewCategorySchema>
+export type ViewConfig = z.infer<typeof ViewsSchema>
 export type Config = z.infer<typeof ConfigSchema>
