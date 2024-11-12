@@ -1,6 +1,7 @@
 'use client'
 
-import { Bell, Bookmark, CircleSlash2, LayoutGrid, Rows3, Settings2, SquareDot, Tag } from "lucide-react"
+import Link from "next/link"
+import { Bell, Bookmark, ChevronRight, CircleSlash2, LayoutGrid, Rows3, Settings2, SquareDot, Tag } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -10,15 +11,19 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { DarkModeToggle } from "./dark-mode-toggle"
-import Link from "next/link"
 import { useConfig } from "@/contexts/config"
 import { useAlerts } from "@/contexts/alerts"
-import { alertFilter, flattenAlerts } from "../alerts/utils"
+import { alertFilter, flattenAlerts } from "@/components/alerts/utils"
+import { ViewConfig } from "@/config/types"
 
 const items = [
   {
@@ -38,13 +43,28 @@ const items = [
   },
 ]
 
+type CategorizedViews = { [key: string]: { handle: string, view: ViewConfig }[] }
 
 export function AppSidebar() {
   const { config } = useConfig()
-  const { views } = config
+  const { views, viewCategories } = config
   const { alerts } = useAlerts()
 
   const flatAlerts = flattenAlerts(alerts)
+
+  // Group views by category
+  const categorizedViews = Object.entries(views).reduce((acc: CategorizedViews, [handle, view]) => {
+    if (handle !== 'default') {
+      const category = view.category || '__uncategorized__';
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push({ handle, view });
+    }
+    return acc;
+  }, {});
+  const uncategorizedViews = categorizedViews.__uncategorized__ || [];
+  delete categorizedViews.__uncategorized__;
 
   return (
     <Sidebar>
@@ -80,30 +100,61 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {Object.entries(views).map(([handle, view]) => (
-                handle === 'default' ? null : (
-                  <SidebarMenuItem key={handle}>
-                    <SidebarMenuButton asChild>
-                      <Link href={`/alerts/${handle}`}>
+              {Object.entries(categorizedViews).map(([category, views]) => (
+                <Collapsible defaultOpen className="group/collapsible" key={category}>
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton >
                         <SquareDot />
-                        <div className="flex items-baseline gap-2 w-full">
-                          <span className="shrink-0 grow">{view.name || handle}</span>
-                          <span className="shrink-0 text-xs text-muted-foreground bg-secondary p-1 w-6 text-center rounded-sm">
-                            {flatAlerts.filter(alertFilter(view.filters)).length}
-                          </span>
-                        </div>
-                      </Link>
-                    </SidebarMenuButton>
+                        <span>{viewCategories[category]?.name || category}</span>
+                        <ChevronRight className="transition-transform ml-auto group-data-[state=open]/collapsible:rotate-90" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {views.map(({ handle, view }) => (
+                          <SidebarMenuItem key={handle}>
+                            <SidebarMenuButton asChild>
+                              <Link href={`/alerts/${handle}`}>
+                                <div className="flex items-baseline gap-2 w-full pr-12">
+                                  <span className="truncate grow">{view.name || handle}</span>
+                                </div>
+                              </Link>
+                            </SidebarMenuButton>
+                            <SidebarMenuBadge className="text-muted-foreground bg-secondary rounded-sm">
+                              {flatAlerts.filter(alertFilter(view.filters)).length}
+                            </SidebarMenuBadge>
+                          </SidebarMenuItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
                   </SidebarMenuItem>
-                )))}
+                </Collapsible>
+              ))}
+              {uncategorizedViews.map(({ handle, view }) => (
+                <SidebarMenuItem key={handle}>
+                  <SidebarMenuButton asChild>
+                    <Link href={`/alerts/${handle}`}>
+                      <div className="flex items-baseline gap-2 w-full pr-12">
+                        <span className="truncate grow">{view.name || handle}</span>
+                      </div>
+                    </Link>
+                  </SidebarMenuButton>
+                  <SidebarMenuBadge className="text-muted-foreground bg-secondary rounded-sm">
+                    {flatAlerts.filter(alertFilter(view.filters)).length}
+                  </SidebarMenuBadge>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+      </SidebarContent >
 
-      </SidebarContent>
-      <SidebarFooter className="flex items-end justify-end">
+      <SidebarFooter className="flex items-end justify-end border-t">
         <DarkModeToggle />
       </SidebarFooter>
-    </Sidebar>
+
+      <SidebarRail />
+    </Sidebar >
   )
 }
