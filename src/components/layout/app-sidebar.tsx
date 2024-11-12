@@ -24,6 +24,7 @@ import { useConfig } from "@/contexts/config"
 import { useAlerts } from "@/contexts/alerts"
 import { alertFilter, flattenAlerts } from "@/components/alerts/utils"
 import { ViewConfig } from "@/config/types"
+import { usePathname } from "next/navigation"
 
 const items = [
   {
@@ -46,6 +47,7 @@ const items = [
 type CategorizedViews = { [key: string]: { handle: string, view: ViewConfig }[] }
 
 export function AppSidebar() {
+  const pathname = usePathname()
   const { config } = useConfig()
   const { views, viewCategories } = config
   const { alerts } = useAlerts()
@@ -82,7 +84,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={pathname === item.url}>
                     <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
@@ -114,7 +116,7 @@ export function AppSidebar() {
                       <SidebarMenuSub>
                         {views.map(({ handle, view }) => (
                           <SidebarMenuItem key={handle}>
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton asChild isActive={pathname === `/alerts/${handle}`}>
                               <Link href={`/alerts/${handle}`}>
                                 <div className="flex items-baseline gap-2 w-full pr-12">
                                   <span className="truncate grow">{view.name || handle}</span>
