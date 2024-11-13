@@ -1,3 +1,5 @@
+'use client'
+
 import { useMemo, useState } from "react"
 import {
   Drawer,
@@ -20,6 +22,7 @@ import { Alert } from "@/types/alertmanager"
 import { Check, ClipboardCopy, Square, SquareArrowOutUpRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { AlertSeverity } from "./alert-severity"
+import { useQueryState } from "nuqs"
 
 function isURL(string: string): boolean {
   try {
@@ -32,16 +35,19 @@ function isURL(string: string): boolean {
 
 type Props = {
   alert: Alert | null
-  setSelectedAlert: (alert: Alert | null) => void
-  close: () => void
 }
 
 export function AlertModal(props: Props) {
-  const { alert, close } = props
+  const { alert } = props
   const { summary } = alert?.annotations || {}
+  const [selectedAlertId, setSelectedAlertId] = useQueryState('alert', { defaultValue: '' })
+
+  const close = () => {
+    setSelectedAlertId(null)
+  }
 
   return (
-    <Sheet open={!!alert} onOpenChange={close}>
+    <Sheet open={!!selectedAlertId} onOpenChange={close}>
       {/* <SheetTrigger>Open</SheetTrigger> */}
       <SheetContent className="w-screen">
         <div className="flex flex-col h-screen">

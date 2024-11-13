@@ -1,16 +1,18 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { notFound } from 'next/navigation'
+import { useQueryState } from 'nuqs'
+import { LoaderCircle, RefreshCcw, TriangleAlert } from 'lucide-react'
 import { Alert } from '@/types/alertmanager'
+import { ViewConfig } from '@/config/types'
 import { useAlerts } from '@/contexts/alerts'
 import AppHeader from '@/components/layout/app-header'
 import { AlertGroups } from './alert-groups'
-import { LoaderCircle, RefreshCcw, TriangleAlert } from 'lucide-react'
-import { useState } from 'react'
 import { AlertModal } from './alert-modal'
-import { LabelFilter, Group } from './types'
+import { Group } from './types'
 import { useConfig } from '@/contexts/config'
 import { alertFilter, alertSort } from './utils'
-import { notFound } from 'next/navigation'
 import {
   Select,
   SelectContent,
@@ -24,38 +26,67 @@ type Props = {
 }
 
 export function AlertsTemplate(props: Props) {
-  const { view } = props
+  const { view: viewName } = props
   const { config } = useConfig()
   const { alerts, loading, errors, refreshAlerts, refreshInterval, setRefreshInterval } = useAlerts()
-  const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null)
 
-  if (!config.views[view]) {
+  // Local state
+  const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null)
+  const [selectedAlertId, _] = useQueryState('alert', { defaultValue: '' })
+  const [flattenedAlerts, setFlattenedAlerts] = useState<Alert[]>([])
+  const [view, setView] = useState<ViewConfig | null>(null)
+  const [alertGroups, setAlertGroups] = useState<Group[]>([])
+
+  // Load view config
+  useEffect(() => setView(config.views[viewName]), [viewName, config])
+
+  // Filter & group matching alerts
+  useEffect(() => {
+    if (!view) {
+      return
+    }
+
+    // Flatten alerts
+    const flatAlerts = Object.values(alerts).reduce((acc, val) => acc.concat(val), [])
+    setFlattenedAlerts(flatAlerts)
+
+    // Filter and sort alerts
+    const filteredAlerts = flatAlerts.filter(alertFilter(view.filters))
+    filteredAlerts.sort(alertSort)
+
+    // Group alerts by specified field
+    const alertGroups: Group[] = Object.entries(
+      filteredAlerts.reduce((acc: Record<string, Alert[]>, alert: Alert) => {
+        const cluster = alert.labels[view.groupBy]
+        if (!acc[cluster]) {
+          acc[cluster] = []
+        }
+        acc[cluster].push(alert)
+        return acc
+      }, {})
+    ).map(([name, alerts]) => ({ name, alerts }))
+    alertGroups.sort((a, b) => {
+      return a.name.localeCompare(b.name)
+    })
+    setAlertGroups(alertGroups)
+  }, [view, alerts])
+
+  // Select alert by ID (fingerprint)
+  useEffect(() => {
+    if (!selectedAlertId) {
+      setSelectedAlert(null)
+      return
+    }
+    const alert = flattenedAlerts.find((a) => a.fingerprint === selectedAlertId)
+    if (alert) {
+      setSelectedAlert(alert)
+    }
+  }, [selectedAlertId, flattenedAlerts])
+
+  // 404 on server side if view not found
+  if (!config.views[viewName]) {
     return notFound()
   }
-
-  const { filters, groupBy, name: viewName } = config.views[view]
-
-  // Flatten alerts
-  const flattenedAlerts = Object.values(alerts).reduce((acc, val) => acc.concat(val), [])
-
-  // Filter and sort alerts
-  const filteredAlerts = flattenedAlerts.filter(alertFilter(filters))
-  filteredAlerts.sort(alertSort)
-
-  // Group alerts by specified field
-  const alertGroups: Group[] = Object.entries(
-    filteredAlerts.reduce((acc: Record<string, Alert[]>, alert: Alert) => {
-      const cluster = alert.labels[groupBy]
-      if (!acc[cluster]) {
-        acc[cluster] = []
-      }
-      acc[cluster].push(alert)
-      return acc
-    }, {})
-  ).map(([name, alerts]) => ({ name, alerts }))
-  alertGroups.sort((a, b) => {
-    return a.name.localeCompare(b.name)
-  })
 
   return (
     <div className="flex flex-col h-screen overflow-clip">
@@ -66,7 +97,7 @@ export function AlertsTemplate(props: Props) {
           </div>
           <div className="text-muted-foreground">/</div>
           <div>
-            {viewName ? viewName : view}
+            {view?.name ? view?.name : viewName}
           </div>
           <div>
             {
@@ -89,8 +120,8 @@ export function AlertsTemplate(props: Props) {
             {loading && (
               <LoaderCircle size={16} className='animate-[spin_1s]' />
             ) || (
-              <RefreshCcw size={16} />
-            )}
+                <RefreshCcw size={16} />
+              )}
           </button>
 
           <div>
@@ -111,10 +142,7 @@ export function AlertsTemplate(props: Props) {
       </AppHeader>
 
       <div className="overflow-auto">
-        <AlertGroups
-          alertGroups={alertGroups}
-          setSelectedAlert={setSelectedAlert}
-        />
+        <AlertGroups alertGroups={alertGroups} />
 
         <footer className="my-6 text-xs flex gap-2 justify-center text-muted-foreground">
           {loading && (
@@ -122,7 +150,7 @@ export function AlertsTemplate(props: Props) {
           ) || (
               <>
                 <span>
-                  Total of <span className="font-semibold">{filteredAlerts.length} alerts</span> displayed.
+                  Total of <span className="font-semibold">{flattenedAlerts.length} alerts</span> displayed.
                 </span>
                 <button
                   disabled={loading}
@@ -138,8 +166,6 @@ export function AlertsTemplate(props: Props) {
 
       <AlertModal
         alert={selectedAlert}
-        setSelectedAlert={setSelectedAlert}
-        close={() => setSelectedAlert(null)}
       />
     </div>
   )

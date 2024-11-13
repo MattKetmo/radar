@@ -1,3 +1,5 @@
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Alert } from "@/types/alertmanager"
 import { formatDate } from "@/lib/date"
 import { stringToColor } from "./utils"
@@ -21,18 +23,27 @@ type Props = {
   alert: Alert
 }
 
+function paramsWithAlert(id: string) {
+  const params = new URLSearchParams(window.location.search)
+  params.set('alert', id)
+  return params.toString()
+}
+
 export function AlertRow(props: Props) {
   const { alert } = props
 
   return (
-    <div className="flex gap-2 xl:gap-4 items-center px-6 h-[45px] border-b group cursor-pointer">
+    <Link
+      href={`?${paramsWithAlert(alert.fingerprint)}`}
+      className="flex gap-2 xl:gap-4 items-center px-6 h-[45px] border-b group cursor-pointer"
+    >
       <AlertSeverity alert={alert} />
       <AlertTitle alert={alert} />
       <AlertSummary alert={alert} />
       <div className="grow" />
       <AlertLabels alert={alert} />
       <AlertTime alert={alert} />
-    </div>
+    </Link>
   )
 }
 
