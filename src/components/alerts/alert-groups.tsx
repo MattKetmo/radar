@@ -14,11 +14,10 @@ import { Group } from "./types"
 
 type AlertGroupsProps = {
   alertGroups: Group[]
-  setSelectedAlert: (alert: Alert | null) => void
 }
 
 export function AlertGroups(props: AlertGroupsProps) {
-  const { alertGroups, setSelectedAlert } = props
+  const { alertGroups } = props
 
   return (
     <div>
@@ -26,7 +25,6 @@ export function AlertGroups(props: AlertGroupsProps) {
         <AlertGroup
           key={alertGroup.name}
           alertGroup={alertGroup}
-          setSelectedAlert={setSelectedAlert}
         />
       ))}
     </div>
@@ -35,11 +33,10 @@ export function AlertGroups(props: AlertGroupsProps) {
 
 type AlertGroupProps = {
   alertGroup: Group
-  setSelectedAlert: (alert: Alert | null) => void
 }
 
 function AlertGroup(props: AlertGroupProps) {
-  const { alertGroup, setSelectedAlert } = props
+  const { alertGroup } = props
   const { name, alerts } = alertGroup
   const [open, setOpen] = useState(true)
 
@@ -58,7 +55,6 @@ function AlertGroup(props: AlertGroupProps) {
           {alerts.map((alert: Alert) => (
             <li
               key={alert.fingerprint}
-              onClick={() => setSelectedAlert(alert)}
               className={cn({
                 'animate-highlight': new Date(alert.startsAt) > new Date(Date.now() - 30 * 60 * 1000)
               })}

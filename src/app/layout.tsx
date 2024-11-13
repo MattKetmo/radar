@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ConfigProvider } from "@/contexts/config";
 import { ThemeProvider } from "next-themes";
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { AppLayout } from "@/components/layout/app-layout";
 import { AlertsProvider } from "@/contexts/alerts";
 
@@ -34,20 +35,22 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <ConfigProvider>
-            <AlertsProvider>
-              <AppLayout>
-                {children}
-              </AppLayout>
-            </AlertsProvider>
-          </ConfigProvider>
-        </ThemeProvider>
+        <NuqsAdapter>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ConfigProvider>
+              <AlertsProvider>
+                <AppLayout>
+                  {children}
+                </AppLayout>
+              </AlertsProvider>
+            </ConfigProvider>
+          </ThemeProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );
