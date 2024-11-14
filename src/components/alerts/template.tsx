@@ -51,18 +51,18 @@ export function AlertsTemplate(props: Props) {
 
     const groupBy = group !== '' ? group : view.groupBy
 
-    // Flatten alerts
-    const flatAlerts = Object.values(alerts).reduce((acc, val) => acc.concat(val), [])
-    setFlattenedAlerts(flatAlerts)
+    // Flatten, filter & sort alerts
+    const flatAlerts = Object.values(alerts).
+      reduce((acc, val) => acc.concat(val), []).
+      filter(alertFilter(view.filters))
+    flatAlerts.sort(alertSort)
 
-    // Filter and sort alerts
-    const filteredAlerts = flatAlerts.filter(alertFilter(view.filters))
-    filteredAlerts.sort(alertSort)
+    setFlattenedAlerts(flatAlerts)
 
     // Group alerts by specified field
     const alertGroups: Group[] = Object.entries(
-      filteredAlerts.reduce((acc: Record<string, Alert[]>, alert: Alert) => {
-        const cluster = alert.labels[groupBy]
+      flatAlerts.reduce((acc: Record<string, Alert[]>, alert: Alert) => {
+        const cluster = alert.labels[view.groupBy]
         if (!acc[cluster]) {
           acc[cluster] = []
         }
@@ -100,7 +100,7 @@ export function AlertsTemplate(props: Props) {
   return (
     <div className="flex flex-col h-screen overflow-clip">
       <AppHeader>
-        <div className='flex items-center  gap-2'>
+        <div className='flex items-center gap-2'>
           <div className="font-medium">
             Alerts
           </div>
@@ -195,9 +195,7 @@ export function AlertsTemplate(props: Props) {
         </footer>
       </div>
 
-      <AlertModal
-        alert={selectedAlert}
-      />
+      <AlertModal alert={selectedAlert} />
     </div>
   )
 }
