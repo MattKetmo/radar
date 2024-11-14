@@ -19,7 +19,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { DarkModeToggle } from "./dark-mode-toggle"
 import { useConfig } from "@/contexts/config"
 import { useAlerts } from "@/contexts/alerts"
 import { alertFilter, flattenAlerts } from "@/components/alerts/utils"
