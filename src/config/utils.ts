@@ -16,7 +16,7 @@ export async function resolveConfigFile(filenames: string[], directory: string):
   throw new Error('No config file found')
 }
 
-export  async function parseConfigFile(filepath: string): Promise<Config> {
+export async function parseConfigFile(filepath: string): Promise<Config> {
   const rawConfig = await fs.readFile(filepath, 'utf-8')
   let parsedConfig
 
@@ -53,4 +53,29 @@ export function resolveEnvVars(obj: any): any {
   } else {
     return obj
   }
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export const memoize = <T extends (...args: any[]) => Promise<any>>(fn: T) => {
+  const cache = new Map<string, ReturnType<T>>()
+  return async function (...args: Parameters<T>): Promise<ReturnType<T>> {
+    const key = JSON.stringify(args)
+    if (cache.has(key)) {
+      return cache.get(key) as ReturnType<T>
+    }
+    const result = await fn(...args)
+    cache.set(key, result)
+    return result
+  }
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export const deepMerge = <T extends { [key: string]: any }>(target: T, source: T): T => {
+  for (const key of Object.keys(source)) {
+    if (source[key] instanceof Object && key in target) {
+      Object.assign(source[key], deepMerge(target[key], source[key]))
+    }
+  }
+  Object.assign(target || {}, source)
+  return target
 }
