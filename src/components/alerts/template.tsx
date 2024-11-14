@@ -62,7 +62,7 @@ export function AlertsTemplate(props: Props) {
     // Group alerts by specified field
     const alertGroups: Group[] = Object.entries(
       flatAlerts.reduce((acc: Record<string, Alert[]>, alert: Alert) => {
-        const cluster = alert.labels[view.groupBy]
+        const cluster = alert.labels[groupBy]
         if (!acc[cluster]) {
           acc[cluster] = []
         }
