@@ -31,7 +31,7 @@ export function SettginsTemplate() {
         <h2 className="text-xl">
           Configuration
         </h2>
-        <pre className="bg-accent rounded-lg p-4 mt-4 grow">
+        <pre className="bg-accent rounded-lg p-4 mt-4 grow text-sm">
           {JSON.stringify(config, null, 2)}
         </pre>
       </section>
