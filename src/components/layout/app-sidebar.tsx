@@ -31,11 +31,11 @@ const items = [
     url: "/alerts",
     icon: Bell,
   },
-  {
-    title: "Silences",
-    url: "/silences",
-    icon: CircleSlash2,
-  },
+  // {
+  //   title: "Silences",
+  //   url: "/silences",
+  //   icon: CircleSlash2,
+  // },
   {
     title: "Settings",
     url: "/settings",
