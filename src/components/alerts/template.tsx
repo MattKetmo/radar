@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { notFound } from 'next/navigation'
 import { useQueryState } from 'nuqs'
-import { LoaderCircle, RefreshCcw, TriangleAlert } from 'lucide-react'
+import { ListFilter, LoaderCircle, RefreshCcw, TriangleAlert } from 'lucide-react'
 import { Alert } from '@/types/alertmanager'
 import { ViewConfig } from '@/config/types'
 import { useAlerts } from '@/contexts/alerts'
@@ -20,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import GroupSelect from './group-select'
+import { Button } from '../ui/button'
 
 type Props = {
   view: string
@@ -32,7 +34,8 @@ export function AlertsTemplate(props: Props) {
 
   // Local state
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null)
-  const [selectedAlertId, _] = useQueryState('alert', { defaultValue: '' })
+  const [selectedAlertId] = useQueryState('alert', { defaultValue: '' })
+  const [group] = useQueryState('group', { defaultValue: '' })
   const [flattenedAlerts, setFlattenedAlerts] = useState<Alert[]>([])
   const [view, setView] = useState<ViewConfig | null>(null)
   const [alertGroups, setAlertGroups] = useState<Group[]>([])
@@ -46,6 +49,8 @@ export function AlertsTemplate(props: Props) {
       return
     }
 
+    const groupBy = group !== '' ? group : view.groupBy
+
     // Flatten alerts
     const flatAlerts = Object.values(alerts).reduce((acc, val) => acc.concat(val), [])
     setFlattenedAlerts(flatAlerts)
@@ -57,7 +62,7 @@ export function AlertsTemplate(props: Props) {
     // Group alerts by specified field
     const alertGroups: Group[] = Object.entries(
       filteredAlerts.reduce((acc: Record<string, Alert[]>, alert: Alert) => {
-        const cluster = alert.labels[view.groupBy]
+        const cluster = alert.labels[groupBy]
         if (!acc[cluster]) {
           acc[cluster] = []
         }
@@ -69,7 +74,7 @@ export function AlertsTemplate(props: Props) {
       return a.name.localeCompare(b.name)
     })
     setAlertGroups(alertGroups)
-  }, [view, alerts])
+  }, [view, alerts, group])
 
   // Select alert by ID (fingerprint)
   useEffect(() => {
@@ -88,6 +93,10 @@ export function AlertsTemplate(props: Props) {
     return notFound()
   }
 
+  const labels = Array.from(new Set(flattenedAlerts.flatMap(alert => Object.keys(alert.labels)))).sort()
+
+  if (!view) return null
+
   return (
     <div className="flex flex-col h-screen overflow-clip">
       <AppHeader>
@@ -97,7 +106,7 @@ export function AlertsTemplate(props: Props) {
           </div>
           <div className="text-muted-foreground">/</div>
           <div>
-            {view?.name ? view?.name : viewName}
+            {view.name ? view.name : viewName}
           </div>
           <div>
             {
@@ -126,12 +135,11 @@ export function AlertsTemplate(props: Props) {
 
           <div>
             <Select value={`${refreshInterval}`} onValueChange={(value) => setRefreshInterval(Number(value))}>
-              <SelectTrigger className="w-[100px] h-[30px]">
+              <SelectTrigger className="w-[80px] h-[30px]">
                 <SelectValue placeholder="Refresh" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="0">Off</SelectItem>
-                <SelectItem value="5">5s</SelectItem>
                 <SelectItem value="10">10s</SelectItem>
                 <SelectItem value="30">30s</SelectItem>
                 <SelectItem value="60">60s</SelectItem>
@@ -140,6 +148,29 @@ export function AlertsTemplate(props: Props) {
           </div>
         </div>
       </AppHeader>
+
+      <div className="flex text-sm items-center px-2 lg:px-6 border-b w-full min-h-[45px] shrink-0 bg-400">
+        <div className='-ml-2'>
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled
+            className="h-[30px] w-full justify-between bg-background px-3 font-normal hover:bg-background"
+          >
+            <ListFilter
+              size={16}
+              strokeWidth={2}
+              className="shrink-0 text-muted-foreground/80"
+              aria-hidden="true"
+            />
+            <span>Filters</span>
+          </Button>
+        </div>
+        <div className='grow' />
+        <div className='flex items-center'>
+          <GroupSelect labels={labels} defaultValue={view.groupBy} />
+        </div>
+      </div>
 
       <div className="overflow-auto">
         <AlertGroups alertGroups={alertGroups} />
