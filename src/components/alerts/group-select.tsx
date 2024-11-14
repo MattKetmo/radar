@@ -25,7 +25,7 @@ export default function GroupSelect(props: Props) {
   const { labels, defaultValue } = props;
 
   const [open, setOpen] = useState<boolean>(false);
-  const [value, setValue] = useQueryState('group', { defaultValue });
+  const [value, setValue] = useQueryState('group', { defaultValue, history: 'push' });
 
   return (
     <div className="flex space-x-2 items-center">
@@ -67,7 +67,7 @@ export default function GroupSelect(props: Props) {
                     key={label}
                     value={label}
                     onSelect={(currentValue) => {
-                      setValue(currentValue === value ? "" : currentValue);
+                      setValue(currentValue);
                       setOpen(false);
                     }}
                   >
