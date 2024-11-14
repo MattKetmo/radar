@@ -152,9 +152,8 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent >
 
-      <SidebarFooter className="flex items-end justify-end border-t">
-        <DarkModeToggle />
-      </SidebarFooter>
+      {/* <SidebarFooter className="flex items-end justify-end border-t">
+      </SidebarFooter> */}
 
       <SidebarRail />
     </Sidebar >
