@@ -23,6 +23,14 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "Radar",
   description: "Dashboard for AlertManager Prometheus",
+  icons: [
+    { rel: "shortcut icon", type: "image/x-icon", url: "/favicon.ico", },
+    { rel: "icon", type: "image/png", sizes: "96x96", url: "/favicon-96x96.png", },
+    { rel: "icon", type: "image/png", sizes: "192x192", url: "/web-app-manifest-192x192.png", },
+    { rel: "icon", type: "image/png", sizes: "512x512", url: "/web-app-manifest-512x512.png", },
+    { rel: "icon", type: "image/svg+xml", sizes: "96x96", url: "/favicon.svg", },
+    { rel: "apple-touch-icon", sizes: "180x180", url: "/apple-touch-icon.png", },
+  ],
 };
 
 export default async function RootLayout({
