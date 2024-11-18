@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ConfigProvider } from "@/contexts/config";
@@ -24,14 +24,24 @@ export const metadata: Metadata = {
   title: "Radar",
   description: "Dashboard for AlertManager Prometheus",
   icons: [
-    { rel: "shortcut icon", type: "image/x-icon", url: "/favicon.ico", },
-    { rel: "icon", type: "image/png", sizes: "96x96", url: "/favicon-96x96.png", },
-    { rel: "icon", type: "image/png", sizes: "192x192", url: "/web-app-manifest-192x192.png", },
-    { rel: "icon", type: "image/png", sizes: "512x512", url: "/web-app-manifest-512x512.png", },
-    { rel: "icon", type: "image/svg+xml", sizes: "96x96", url: "/favicon.svg", },
-    { rel: "apple-touch-icon", sizes: "180x180", url: "/apple-touch-icon.png", },
+    { rel: "shortcut icon", type: "image/x-icon", url: "/icons/favicon.ico", },
+    { rel: "icon", type: "image/png", sizes: "96x96", url: "/icons/manifest-any-96x96.png", },
+    { rel: "icon", type: "image/png", sizes: "192x192", url: "/icons/manifest-any-192x192.png", },
+    { rel: "icon", type: "image/png", sizes: "256x256", url: "/icons/manifest-any-256x256.png", },
+    { rel: "icon", type: "image/png", sizes: "384x384", url: "/icons/manifest-any-384x384.png", },
+    { rel: "icon", type: "image/png", sizes: "512x512", url: "/icons/manifest-any-512x512.png", },
+    { rel: "icon", type: "image/png", sizes: "1024x1024", url: "/icons/manifest-any-1024x1024.png", },
+    { rel: "icon", type: "image/svg+xml", sizes: "96x96", url: "/icons/favicon.svg", },
+    { rel: "apple-touch-icon", sizes: "180x180", url: "/icons/apple-touch-icon.png", },
   ],
 };
+
+export const viewport: Viewport = {
+  themeColor: [
+    { color: "#EEF2F8", media: "(prefers-color-scheme: light)" },
+    { color: "#171717", media: "(prefers-color-scheme: dark)" },
+  ]
+}
 
 export default async function RootLayout({
   children,
