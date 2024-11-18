@@ -31,14 +31,14 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
       // Fetch alerts for this cluster
       const response = await fetch(`/api/clusters/${cluster.name}/alerts`)
       if (!response.ok) {
-        throw new Error(`Failed to fetch alerts for ${cluster.name}`)
+        throw new Error(`failed to fetch alerts`)
       }
       const data = await response.json()
 
       // Validate the response data
       const parsedData = z.array(AlertSchema).safeParse(data)
       if (!parsedData.success) {
-        throw new Error(`Invalid alert format for ${cluster.name}`)
+        throw new Error(`invalid alert format`)
       }
 
       // Add extra labels to each alert

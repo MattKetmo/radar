@@ -4,14 +4,16 @@ import { useEffect, useState } from 'react'
 import { notFound } from 'next/navigation'
 import { useQueryState } from 'nuqs'
 import { ListFilter, LoaderCircle, RefreshCcw, TriangleAlert } from 'lucide-react'
-import { Alert } from '@/types/alertmanager'
 import { ViewConfig } from '@/config/types'
 import { useAlerts } from '@/contexts/alerts'
+import { useConfig } from '@/contexts/config'
 import AppHeader from '@/components/layout/app-header'
+import { Button } from '@/components/ui/button'
+import { Alert } from '@/types/alertmanager'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { AlertGroups } from './alert-groups'
 import { AlertModal } from './alert-modal'
 import { Group } from './types'
-import { useConfig } from '@/contexts/config'
 import { alertFilter, alertSort } from './utils'
 import {
   Select,
@@ -21,7 +23,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import GroupSelect from './group-select'
-import { Button } from '../ui/button'
 
 type Props = {
   view: string
@@ -111,10 +112,25 @@ export function AlertsTemplate(props: Props) {
           <div>
             {
               !loading && Object.entries(errors).length > 0 && (
-                <TriangleAlert
-                  size={16}
-                  className='text-orange-500'
-                />
+                <TooltipProvider delayDuration={150}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <TriangleAlert
+                        size={16}
+                        className='text-orange-500'
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <ul>
+                        {Object.entries(errors).map(([cluster, message]) => (
+                          <li key={cluster}>
+                            <span className='font-semibold'>{cluster}</span>: {message}
+                          </li>
+                        ))}
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )
             }
           </div>
