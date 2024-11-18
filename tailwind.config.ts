@@ -93,7 +93,7 @@ const config: Config = {
             transform: 'rotate(360deg)'
           },
         },
-        'highlight': {
+        'row-highlight': {
           '0%': {
             background: 'var(--row-highlight)',
           },
@@ -106,7 +106,7 @@ const config: Config = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'reverse-spin': 'reverse-spin 1s linear infinite',
-        highlight: 'highlight 3s',
+        'row-highlight': 'row-highlight 3s',
       }
     }
   },

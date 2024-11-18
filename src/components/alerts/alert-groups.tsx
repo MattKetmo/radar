@@ -56,7 +56,7 @@ function AlertGroup(props: AlertGroupProps) {
             <li
               key={alert.fingerprint}
               className={cn({
-                'animate-highlight': new Date(alert.startsAt) > new Date(Date.now() - 30 * 60 * 1000)
+                'animate-row-highlight': new Date(alert.startsAt) > new Date(Date.now() - 30 * 60 * 1000)
               })}
             >
               <AlertRow alert={alert} />
