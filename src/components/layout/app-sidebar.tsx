@@ -107,7 +107,7 @@ export function AppSidebar() {
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton >
                         <SquareDot />
-                        <span>{viewCategories[category]?.name || category}</span>
+                        <span className="truncate">{viewCategories[category]?.name || category}</span>
                         <ChevronRight className="transition-transform ml-auto group-data-[state=open]/collapsible:rotate-90" />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>

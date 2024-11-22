@@ -188,7 +188,7 @@ export function AlertsTemplate(props: Props) {
         </div>
       </div>
 
-      <div className="overflow-auto">
+      <div className="overflow-x-clip overflow-y-auto">
         <AlertGroups alertGroups={alertGroups} />
 
         <footer className="my-6 text-xs flex gap-2 justify-center text-muted-foreground">

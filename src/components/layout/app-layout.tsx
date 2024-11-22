@@ -10,7 +10,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <AppSidebar />
       <CommandMenu />
       <main className="grow relative bg-sidebar">
-        <div className="absolute inset-0 bg-background m-2 rounded-sm overflow-auto border">
+        <div className="absolute inset-0 bg-background m-2 rounded-lg overflow-auto border">
           {children}
         </div>
       </main>

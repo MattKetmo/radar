@@ -79,8 +79,8 @@ function AlertGroupHeader(props: AlertGroupHeaderProps) {
 
   return (
     <div className="flex space-x-2 items-center w-full">
-      <div className="flex items-baseline gap-2">
-        <span className="text-sm font-mono font-medium group-hover:underline">
+      <div className="flex items-baseline gap-2 overflow-hidden">
+        <span className="text-sm font-mono truncate font-medium group-hover:underline">
           {name}
         </span>
         <span className="text-xs text-slate-500 bg-secondary rounded-sm p-1 w-6 text-center">
@@ -89,10 +89,7 @@ function AlertGroupHeader(props: AlertGroupHeaderProps) {
       </div>
       <div className="grow" />
       <div>
-        <ChevronDown size={16} className={cn(
-          'transition-transform',
-          !open ? '-rotate-90' : '',
-        )} />
+        <ChevronDown size={16} className={cn('transition-transform', !open ? '-rotate-90' : '')} />
       </div>
     </div>
   )
