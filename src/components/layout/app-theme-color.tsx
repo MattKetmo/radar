@@ -3,8 +3,8 @@
 import { useTheme } from "next-themes"
 import { useEffect } from "react"
 
-const THEME_COLOR_DARK = '#171717'
-const THEME_COLOR_LIGHT = '#EEF2F8'
+const THEME_COLOR_DARK = '#020217'
+const THEME_COLOR_LIGHT = '#FAFAFA'
 
 // Set the theme color meta tag based on the current theme
 export function AppThemeColor() {

@@ -99,7 +99,7 @@ export function AlertsTemplate(props: Props) {
   if (!view) return null
 
   return (
-    <div className="flex flex-col h-screen overflow-clip">
+    <div className="flex flex-col h-full">
       <AppHeader>
         <div className='flex items-center gap-2'>
           <div className="font-medium">
