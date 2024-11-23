@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import GroupSelect from './group-select'
+import { useHotkeys } from 'react-hotkeys-hook'
 
 type Props = {
   view: string
@@ -40,6 +41,8 @@ export function AlertsTemplate(props: Props) {
   const [flattenedAlerts, setFlattenedAlerts] = useState<Alert[]>([])
   const [view, setView] = useState<ViewConfig | null>(null)
   const [alertGroups, setAlertGroups] = useState<Group[]>([])
+
+  useHotkeys('r', () => refreshAlerts(), []);
 
   // Load view config
   useEffect(() => setView(config.views[viewName]), [viewName, config])
@@ -137,17 +140,25 @@ export function AlertsTemplate(props: Props) {
 
           <div className='grow' />
 
-          <button
-            disabled={loading}
-            onClick={() => refreshAlerts()}
-            className={loading ? 'cursor-not-allowed text-muted-foreground ' : ''}
-          >
-            {loading && (
-              <LoaderCircle size={16} className='animate-[spin_1s]' />
-            ) || (
-                <RefreshCcw size={16} />
-              )}
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                disabled={loading}
+                onClick={() => refreshAlerts()}
+                className={loading ? 'cursor-not-allowed text-muted-foreground ' : ''}
+              >
+                {loading && (
+                  <LoaderCircle size={16} className='animate-[spin_1s]' />
+                ) || (
+                    <RefreshCcw size={16} />
+                  )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="left" className="flex items-center gap-2">
+              <span>Refresh</span>
+              <span className="font-mono flex items-center justify-center h-5 w-5 text-muted-foreground border-muted-foreground border rounded-sm">R</span>
+            </TooltipContent>
+          </Tooltip>
 
           <div>
             <Select value={`${refreshInterval}`} onValueChange={(value) => setRefreshInterval(Number(value))}>
