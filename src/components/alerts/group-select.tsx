@@ -1,10 +1,11 @@
 "use client";
 
-import { Label } from "@/components/ui/label";
-import { Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { Boxes, Check, ChevronDown } from "lucide-react";
 import { useQueryState } from "nuqs";
+import { useHotkeys } from "react-hotkeys-hook";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Command,
   CommandEmpty,
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type Props = {
   labels: string[];
@@ -27,9 +29,25 @@ export default function GroupSelect(props: Props) {
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useQueryState('group', { defaultValue, history: 'push' });
 
+  useHotkeys('g', (e) => {
+    e.preventDefault(); // Prevent typing in input field
+    setOpen(true)
+  }, []);
+
   return (
     <div className="flex space-x-2 items-center">
-      <Label htmlFor="group-select" className="text-nowrap text-muted-foreground">Group by</Label>
+      <Label htmlFor="group-select" className="text-nowrap text-muted-foreground">
+        <span className="sr-only">Group by</span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Boxes size={16} className="shrink-0" />
+          </TooltipTrigger>
+          <TooltipContent side="left" className="flex items-center gap-2">
+            <span>Group by</span>
+            <span className="font-mono flex items-center justify-center h-5 w-5 text-muted-foreground border-muted-foreground border rounded-sm">G</span>
+          </TooltipContent>
+        </Tooltip>
+      </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button

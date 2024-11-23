@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { AppLayout } from "@/components/layout/app-layout";
 import { AlertsProvider } from "@/contexts/alerts";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const dynamic = "force-dynamic";
 
@@ -53,13 +54,15 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <ConfigProvider>
-              <AlertsProvider>
-                <AppLayout>
-                  {children}
-                </AppLayout>
-              </AlertsProvider>
-            </ConfigProvider>
+            <TooltipProvider delayDuration={150}>
+              <ConfigProvider>
+                <AlertsProvider>
+                  <AppLayout>
+                    {children}
+                  </AppLayout>
+                </AlertsProvider>
+              </ConfigProvider>
+            </TooltipProvider>
           </ThemeProvider>
         </NuqsAdapter>
       </body>
