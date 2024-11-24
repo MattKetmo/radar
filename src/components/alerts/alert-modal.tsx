@@ -168,9 +168,14 @@ function AlertQuery(props: { alert: Alert }) {
   const [copied, setCopied] = useState(false)
   const query = useMemo(() => {
     if (!alert?.generatorURL) return null
-    const url = new URL(alert.generatorURL)
-    const g0Expr = url.searchParams.get("g0.expr")
-    return g0Expr ? decodeURIComponent(g0Expr) : null
+    try {
+      // TODO: generatorURL can be a simply path, not a full URL (eg Loki alerts /explore?left={\"queries\":...})
+      const url = new URL(alert.generatorURL)
+      const g0Expr = url.searchParams.get("g0.expr")
+      return g0Expr ? decodeURIComponent(g0Expr) : null
+    } catch {
+      return null
+    }
   }, [alert])
 
   if (!query) return null

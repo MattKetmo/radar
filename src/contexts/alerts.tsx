@@ -38,6 +38,7 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
       // Validate the response data
       const parsedData = z.array(AlertSchema).safeParse(data)
       if (!parsedData.success) {
+        console.error(`invalid alert format`, parsedData.error.errors)
         throw new Error(`invalid alert format`)
       }
 
