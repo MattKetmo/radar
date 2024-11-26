@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   title: "Radar",
   description: "Dashboard for AlertManager Prometheus",
   icons: [
-    { rel: "shortcut icon", type: "image/x-icon", url: "/icons/favicon.ico", },
+    { rel: "shortcut icon", type: "image/x-icon", url: "/favicon.ico", },
     { rel: "icon", type: "image/png", sizes: "96x96", url: "/icons/manifest-any-96x96.png", },
     { rel: "icon", type: "image/png", sizes: "192x192", url: "/icons/manifest-any-192x192.png", },
     { rel: "icon", type: "image/png", sizes: "256x256", url: "/icons/manifest-any-256x256.png", },
