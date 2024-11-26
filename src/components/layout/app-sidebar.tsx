@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link"
-import { Bell, Bookmark, ChevronRight, CircleSlash2, LayoutGrid, Rows3, Settings2, SquareDot, Tag } from "lucide-react"
+import { Bell, ChevronRight, MessageCircleQuestion, Settings2, SquareArrowOutUpRight, SquareDot } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -91,6 +91,17 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a target="_blank" href="https://github.com/MattKetmo/radar/issues">
+                    <MessageCircleQuestion />
+                    <span>Feedback</span>
+                  </a>
+                </SidebarMenuButton>
+                <SidebarMenuBadge className="text-muted-foreground">
+                  <SquareArrowOutUpRight size={14} />
+                </SidebarMenuBadge>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
