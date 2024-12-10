@@ -16,6 +16,7 @@ export const ViewsSchema = z.object({
   name: z.string().optional().default(''),
   groupBy: z.string(),
   category: z.string().optional().default(''),
+  filtersMatch: z.enum(['all', 'any']).optional().default('all'),
   filters: z.array(
     z.object({
       label: z.string(),
