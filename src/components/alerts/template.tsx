@@ -42,6 +42,7 @@ export function AlertsTemplate(props: Props) {
   const [view, setView] = useState<ViewConfig | null>(null)
   const [alertGroups, setAlertGroups] = useState<Group[]>([])
   const [filters] = useQueryState('filters', parseAsArrayOf(parseAsFilter, ';'))
+  const [filterMatch] = useQueryState('match', { defaultValue: 'all' })
 
   useHotkeys('r', () => refreshAlerts(), []);
 
@@ -56,13 +57,11 @@ export function AlertsTemplate(props: Props) {
 
     const groupBy = group !== '' ? group : view.groupBy
 
-    // Merge view filters with query filters
-    const alertFilters = view.filters.concat(filters || [])
-
     // Flatten, filter & sort alerts
-    const flatAlerts = Object.values(alerts).
-      reduce((acc, val) => acc.concat(val), []).
-      filter(alertFilter(alertFilters))
+    const flatAlerts = Object.values(alerts)
+      .reduce((acc, val) => acc.concat(val), [])
+      .filter(alertFilter(view.filters, view.filtersMatch === 'all'))
+      .filter(alertFilter(filters || [], filterMatch === 'all'))
     flatAlerts.sort(alertSort)
 
     setFlattenedAlerts(flatAlerts)

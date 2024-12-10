@@ -52,9 +52,9 @@ export function flattenAlerts(alerts: Record<string, Alert[]>): Alert[] {
   return Object.values(alerts).reduce((acc, val) => acc.concat(val), [])
 }
 
-export function alertFilter(filters: LabelFilter[]): (alert: Alert) => boolean {
+export function alertFilter(filters: LabelFilter[], matchAll = true): (alert: Alert) => boolean {
   return (alert: Alert) => {
-    return filters.map(filter => {
+    const matches = filters.map(filter => {
       if (showOnlyActive && alert.status.state !== 'active') {
         return false
       }
@@ -74,7 +74,9 @@ export function alertFilter(filters: LabelFilter[]): (alert: Alert) => boolean {
         }
         return filter.value.includes(value)
       }
-    }).every(Boolean)
+    })
+
+    return matchAll ? matches.every(Boolean) : matches.some(Boolean)
   }
 }
 
