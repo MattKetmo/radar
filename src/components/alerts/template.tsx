@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { notFound } from 'next/navigation'
-import { useQueryState } from 'nuqs'
+import { parseAsArrayOf, useQueryState } from 'nuqs'
 import { ListFilter, LoaderCircle, RefreshCcw, TriangleAlert } from 'lucide-react'
 import { ViewConfig } from '@/config/types'
 import { useAlerts } from '@/contexts/alerts'
@@ -13,8 +13,8 @@ import { Alert } from '@/types/alertmanager'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { AlertGroups } from './alert-groups'
 import { AlertModal } from './alert-modal'
-import { Group } from './types'
-import { alertFilter, alertSort } from './utils'
+import { Group, LabelFilter } from './types'
+import { alertFilter, alertSort, parseAsFilter } from './utils'
 import {
   Select,
   SelectContent,
@@ -41,6 +41,7 @@ export function AlertsTemplate(props: Props) {
   const [flattenedAlerts, setFlattenedAlerts] = useState<Alert[]>([])
   const [view, setView] = useState<ViewConfig | null>(null)
   const [alertGroups, setAlertGroups] = useState<Group[]>([])
+  const [filters] = useQueryState('filters', parseAsArrayOf(parseAsFilter, ';'))
 
   useHotkeys('r', () => refreshAlerts(), []);
 
@@ -55,10 +56,13 @@ export function AlertsTemplate(props: Props) {
 
     const groupBy = group !== '' ? group : view.groupBy
 
+    // Merge view filters with query filters
+    const alertFilters = view.filters.concat(filters || [])
+
     // Flatten, filter & sort alerts
     const flatAlerts = Object.values(alerts).
       reduce((acc, val) => acc.concat(val), []).
-      filter(alertFilter(view.filters))
+      filter(alertFilter(alertFilters))
     flatAlerts.sort(alertSort)
 
     setFlattenedAlerts(flatAlerts)

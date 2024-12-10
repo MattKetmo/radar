@@ -1,7 +1,52 @@
 import { Alert } from "@/types/alertmanager"
 import { LabelFilter } from "./types"
+import { createParser } from "nuqs"
 
 const showOnlyActive = true
+
+const filterRegex = /(?<label>\w+)(?<pattern>|!=|=~|!~|=)(?<value>[^!=~]+)/
+
+export function parseFilter(filterStr: string): LabelFilter {
+  const match = filterStr.match(filterRegex)
+
+  const label = match?.groups?.label || ''
+  const regex = match?.groups?.pattern === '=~' || match?.groups?.pattern === '!~'
+  const exclude = match?.groups?.pattern === '!=' || match?.groups?.pattern === '!~'
+
+  let value: string | string[] = match?.groups?.value || ''
+  if (typeof value === 'string' && value.includes(',')) {
+    value = value.split(',')
+  }
+
+  return { label, exclude, regex, value }
+}
+
+export function filterToString(filter: LabelFilter): string {
+  const label = filter.label
+  const value = Array.isArray(filter.value) ? filter.value.join(',') : filter.value
+
+  if (filter.regex && filter.exclude) {
+    return `${label}!~${value}`
+  }
+  if (filter.regex) {
+    return `${label}=~${value}`
+  }
+  if (filter.exclude) {
+    return `${label}!=${value}`
+  }
+
+  return `${label}=${value}`
+}
+
+// Custom nuqs parser
+export const parseAsFilter = createParser<LabelFilter>({
+  parse(queryValue) {
+    return parseFilter(queryValue)
+  },
+  serialize(value) {
+    return filterToString(value)
+  }
+})
 
 export function flattenAlerts(alerts: Record<string, Alert[]>): Alert[] {
   return Object.values(alerts).reduce((acc, val) => acc.concat(val), [])

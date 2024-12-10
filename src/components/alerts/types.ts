@@ -10,6 +10,6 @@ export type Filter = (alert: Alert) => boolean
 export type LabelFilter = {
   label: string
   value: string | string[]
-  exclude?: boolean
-  regex?: boolean
+  exclude: boolean
+  regex: boolean
 }
