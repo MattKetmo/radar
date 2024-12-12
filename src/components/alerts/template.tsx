@@ -82,7 +82,7 @@ export function AlertsTemplate(props: Props) {
       return a.name.localeCompare(b.name)
     })
     setAlertGroups(alertGroups)
-  }, [view, alerts, group])
+  }, [view, alerts, group, filters])
 
   // Select alert by ID (fingerprint)
   useEffect(() => {

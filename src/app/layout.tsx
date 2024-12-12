@@ -7,6 +7,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { AppLayout } from "@/components/layout/app-layout";
 import { AlertsProvider } from "@/contexts/alerts";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { LogoutDetectedDialog } from "@/components/layout/logout-detected-dialog";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +61,7 @@ export default async function RootLayout({
                   <AppLayout>
                     {children}
                   </AppLayout>
+                  <LogoutDetectedDialog />
                 </AlertsProvider>
               </ConfigProvider>
             </TooltipProvider>
