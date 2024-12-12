@@ -10,6 +10,7 @@ interface AlertsContextProps {
   alerts: Record<string, Alert[]>
   errors: Record<string, string>
   loading: boolean
+  logoutDetected: boolean
   refreshInterval: number
   setRefreshInterval: (interval: number) => void
   refreshAlerts: () => Promise<void>
@@ -22,6 +23,7 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
   const { clusters } = config
 
   const [loading, setLoading] = useState(false)
+  const [logoutDetected, setLogoutDetected] = useState(false)
   const [alerts, setAlerts] = useState<Record<string, Alert[]>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [refreshInterval, setRefreshInterval] = useState<number>(30)
@@ -29,7 +31,11 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
   const fetchAlertsForCluster = async (cluster: ClusterConfig) => {
     try {
       // Fetch alerts for this cluster
-      const response = await fetch(`/api/clusters/${cluster.name}/alerts`)
+      const response = await fetch(`/api/clusters/${cluster.name}/alerts`, { redirect: 'manual' })
+      if (response.type === 'opaqueredirect') {
+        setLogoutDetected(true)
+        throw new Error(`redirection not allowed`)
+      }
       if (!response.ok) {
         throw new Error(`failed to fetch alerts`)
       }
@@ -102,6 +108,7 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
     alerts,
     errors,
     loading,
+    logoutDetected,
     refreshInterval,
     setRefreshInterval,
     refreshAlerts,
