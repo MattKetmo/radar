@@ -1,10 +1,14 @@
 'use client'
 
+import { useTheme } from 'next-themes'
+import ReactJson from 'react-json-view'
 import { useConfig } from "@/contexts/config"
 import ThemeSelect from "./theme-select"
 
 export function SettginsTemplate() {
   const { config } = useConfig()
+  const { theme } = useTheme()
+
   return (
     <div className="p-4 max-w-3xl mx-auto gap-8 flex flex-col">
       <div className="border-b">
@@ -31,9 +35,18 @@ export function SettginsTemplate() {
         <h2 className="text-xl">
           Configuration
         </h2>
-        <pre className="bg-accent rounded-lg p-4 mt-4 grow text-sm">
-          {JSON.stringify(config, null, 2)}
-        </pre>
+        <div className="mt-4">
+          <ReactJson
+            src={config}
+            name={false}
+            quotesOnKeys={false}
+            theme={theme === 'dark' ? 'monokai' : 'rjv-default'}
+            style={{backgroundColor: 'transparent'}}
+            displayDataTypes={false}
+            enableClipboard={false}
+            shouldCollapse={({ namespace }) => namespace.length > 2}
+          />
+        </div>
       </section>
     </div>
   )

@@ -31,6 +31,7 @@
     "react": "19.0.0-rc-02c0e824-20241028",
     "react-dom": "19.0.0-rc-02c0e824-20241028",
     "react-hotkeys-hook": "^4.6.1",
+    "react-json-view": "^1.21.3",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "ts-key-enum": "^3.0.13",
