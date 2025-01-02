@@ -51,9 +51,9 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
       // Add extra labels to each alert
       parsedData.data.forEach(alert => {
         alert.labels = {
+          '@cluster': cluster.name,
           ...alert.labels,
           ...cluster.labels,
-          '@cluster': cluster.name,
         }
       })
 
