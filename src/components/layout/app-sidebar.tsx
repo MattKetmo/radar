@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link"
-import { Bell, ChevronRight, MessageCircleQuestion, Settings2, SquareArrowOutUpRight, SquareDot } from "lucide-react"
+import { Bell, ChevronRight, CircleSlash2, MessageCircleQuestion, Settings2, SquareArrowOutUpRight, SquareDot } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -31,11 +31,11 @@ const items = [
     url: "/alerts",
     icon: Bell,
   },
-  // {
-  //   title: "Silences",
-  //   url: "/silences",
-  //   icon: CircleSlash2,
-  // },
+  {
+    title: "Silences",
+    url: "/silences",
+    icon: CircleSlash2,
+  },
   {
     title: "Settings",
     url: "/settings",
