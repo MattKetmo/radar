@@ -33,7 +33,7 @@ function SilenceGroup(props: SilenceGroupProps) {
       <ul>
         {silenceGroup.silences.map(silence => (
           <li key={`${silenceGroup.name}-${silence.id}`}>
-            <SilenceRow silence={silence} />
+            <SilenceRow silence={silence} cluster={silenceGroup.name} />
           </li>
         ))}
       </ul>
