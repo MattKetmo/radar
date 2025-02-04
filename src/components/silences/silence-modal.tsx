@@ -120,7 +120,7 @@ function SilenceMatchers({ silence }: SilenceMatcherProps) {
       </h3>
       <div className="text-sm mt-2 flex gap-2 flex-col">
         {silence.matchers.map((matcher, i) => (
-          <span key={i} className="truncate inline-flex gap-1 items-center  leading-tight">
+          <span key={i} className="truncate inline-flex gap-1 items-center leading-tight">
             <span className="text-sm bg-secondary px-3 py-1 items-center rounded-sm flex hover:border-primary">
               <strong className="font-semibold">{matcher.name}</strong>
               <span>{matcherOperator(matcher.isEqual, matcher.isRegex)}</span>

@@ -133,6 +133,8 @@ function AlertLabels(props: { alert: Alert }) {
   const { alert } = props
   const [expanded, setExpanded] = useState(false)
 
+  const defaultLength = 12
+
   const selectElement = (e: React.MouseEvent<HTMLSpanElement>) => {
     const range = document.createRange();
     range.selectNodeContents(e.currentTarget);
@@ -145,20 +147,22 @@ function AlertLabels(props: { alert: Alert }) {
     <div>
       <h3 className="text-sm font-medium flex item-center gap-2">
         Labels
-        <button className="text-xs text-blue-500 focus:outline-0" onClick={() => setExpanded(e => !e)}>
-          {expanded ? 'show less' : 'show all'}
-        </button>
       </h3>
-      <div className={cn("text-sm mt-1 flex gap-2", expanded ? 'flex-col' : 'flex-wrap')}>
-        {Object.entries(alert.labels).map(([key, value]) => (
-          <span key={key} className="truncate inline-flex gap-1 items-center  leading-tight">
-            <span className="bg-secondary px-1">
-              <span onDoubleClick={selectElement} className="font-semibold font-mono">{key}</span>{': '}
+      <div className="text-sm mt-1 flex gap-2 flex-col">
+        {Object.entries(alert.labels).sort().slice(0, expanded ? 100 : defaultLength).map(([key, value]) => (
+          <span key={key} className="truncate inline-flex gap-1 items-center leading-tight">
+            <span className="text-sm bg-secondary px-3 py-1 gap-1 items-center rounded-sm flex hover:border-primary">
+              <span onDoubleClick={selectElement} className="font-semibold font-mono">{key}: </span>
               <span onDoubleClick={selectElement}>{value}</span>
             </span>
           </span>
         ))}
       </div>
+      {Object.keys(alert.labels).length > 10 && (
+        <button className="text-xs mt-2 text-blue-500 focus:outline-0" onClick={() => setExpanded(e => !e)}>
+          {expanded ? 'show less' : 'show more'}
+        </button>
+      )}
     </div >
   )
 }
