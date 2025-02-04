@@ -1,22 +1,21 @@
 'use client'
 
+import { useEffect } from "react"
 import Link from "next/link"
 import { Bell, ChevronRight, CircleSlash2, MessageCircleQuestion, Settings2, SquareArrowOutUpRight, SquareDot } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarRail,
-  SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useConfig } from "@/contexts/config"
@@ -47,9 +46,11 @@ type CategorizedViews = { [key: string]: { handle: string, view: ViewConfig }[] 
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const { setOpenMobile } = useSidebar();
   const { config } = useConfig()
   const { views, viewCategories } = config
   const { alerts } = useAlerts()
+
 
   const flatAlerts = flattenAlerts(alerts)
 
@@ -84,7 +85,7 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={pathname === item.url}>
-                    <Link href={item.url}>
+                    <Link href={item.url} onClick={() => setOpenMobile(false)}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
