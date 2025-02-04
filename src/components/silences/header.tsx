@@ -1,4 +1,4 @@
-import { LoaderCircle, RefreshCcw, TriangleAlert } from 'lucide-react';
+import { LoaderCircle, Plus, RefreshCcw, TriangleAlert } from 'lucide-react';
 import AppHeader from '@/components/layout/app-header';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -38,7 +38,10 @@ export function Header(props: Props) {
           </Link>
         </div>
         <div>
-          <Button size="xs" className='px-4 py-0.5'>New silence</Button>
+          <Button size="xs" className='pl-4 pr-2 py-0.5'>
+            New silence
+            <Plus className='' />
+          </Button>
         </div> */}
         <div>
           {
