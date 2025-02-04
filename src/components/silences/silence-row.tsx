@@ -41,7 +41,7 @@ export function SilenceRow({ silence, cluster }: { silence: Silence, cluster: st
       <div
         title={`${matchedAlerts.length} alerts matched`}
         className={cn(
-          "text-xs bg-secondary text-secondary-foreground w-5 h-5 rounded-sm flex items-center justify-center",
+          "text-xs bg-secondary text-secondary-foreground w-5 h-5 rounded-sm flex items-center justify-center shrink-0",
           matchedAlerts.length > 0 && 'bg-destructive text-destructive-foreground'
         )}>
         {matchedAlerts.length}
