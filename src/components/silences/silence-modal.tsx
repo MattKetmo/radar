@@ -70,23 +70,25 @@ export function SilenceModal(props: Props) {
                     </div>
                   </div>
                   <div className="mt-4 space-y-2">
-                    <div className="text-sm">
+                    {/*<div className="text-sm">
                       <strong>ID:</strong> {silence.id}
+                    </div>*/}
+                    <div className="flex">
+                      <time
+                        className="text-sm block grow"
+                        dateTime={silence.startsAt}
+                        title={silence.startsAt}
+                      >
+                        Started <span className="font-semibold">{formatDistanceToNowStrict(new Date(silence.startsAt), { addSuffix: true })}</span>
+                      </time>
+                      <time
+                        className="text-sm block"
+                        dateTime={silence.endsAt}
+                        title={silence.endsAt}
+                      >
+                        Expires in <span className="font-semibold">{formatDistanceToNowStrict(new Date(silence.endsAt), {})}</span>
+                      </time>
                     </div>
-                    <time
-                      className="text-sm block"
-                      dateTime={silence.startsAt}
-                      title={silence.startsAt}
-                    >
-                      <strong>Started</strong>: {formatDistanceToNowStrict(new Date(silence.startsAt), { addSuffix: true })}
-                    </time>
-                    <time
-                      className="text-sm block"
-                      dateTime={silence.endsAt}
-                      title={silence.endsAt}
-                    >
-                      <strong>Expires:</strong> in {formatDistanceToNowStrict(new Date(silence.endsAt), {})}
-                    </time>
                   </div>
 
                   <div className="mt-6">
