@@ -4,6 +4,8 @@ import { Alert } from "@/types/alertmanager"
 import { formatDate } from "@/lib/date"
 import { stringToColor } from "./utils"
 import { AlertSeverity } from "./alert-severity"
+import { BellOff, MegaphoneOff } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 const importantLabels = [
   'host',
@@ -35,15 +37,31 @@ export function AlertRow(props: Props) {
   return (
     <Link
       href={`?${paramsWithAlert(alert.fingerprint)}`}
-      className="flex gap-2 xl:gap-4 items-center px-6 h-[45px] border-b group cursor-pointer"
+      className="flex gap-2 xl:gap-4 items-center px-8 relative h-[45px] border-b group cursor-pointer"
     >
       <AlertSeverity alert={alert} />
+      <AlertState alert={alert} />
       <AlertTitle alert={alert} />
       <AlertSummary alert={alert} />
       <div className="grow" />
       <AlertLabels alert={alert} />
       <AlertTime alert={alert} />
     </Link>
+  )
+}
+
+function AlertState({ alert }: { alert: Alert }) {
+  const { state } = alert.status
+  const isActive = state === 'active'
+
+  if (isActive) {
+    return null
+  }
+
+  return (
+    <div title="Alert silenced" className="shrink-0">
+      <BellOff size={12} className="-mr-2" />
+    </div>
   )
 }
 

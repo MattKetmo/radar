@@ -43,6 +43,7 @@ export function AlertsTemplate(props: Props) {
   const [alertGroups, setAlertGroups] = useState<Group[]>([])
   const [filters] = useQueryState('filters', parseAsArrayOf(parseAsFilter, ';'))
   const [filterMatch] = useQueryState('match', { defaultValue: 'all' })
+  const [alertState, setAlertState] = useQueryState('state', { defaultValue: 'active' })
 
   useHotkeys('r', () => refreshAlerts(), []);
 
@@ -67,8 +68,11 @@ export function AlertsTemplate(props: Props) {
     setFlattenedAlerts(flatAlerts)
 
     // Group alerts by specified field
+    const filterActive = alertState !== 'inactive'
     const alertGroups: Group[] = Object.entries(
-      flatAlerts.reduce((acc: Record<string, Alert[]>, alert: Alert) => {
+      flatAlerts
+        .filter((alert) => filterActive ? alert.status.state === 'active' : alert.status.state !== 'active')
+        .reduce((acc: Record<string, Alert[]>, alert: Alert) => {
         const cluster = alert.labels[groupBy]
         if (!acc[cluster]) {
           acc[cluster] = []
@@ -81,7 +85,7 @@ export function AlertsTemplate(props: Props) {
       return a.name.localeCompare(b.name)
     })
     setAlertGroups(alertGroups)
-  }, [view, alerts, group, filters, filterMatch])
+  }, [view, alerts, group, filters, filterMatch, alertState])
 
   // Select alert by ID (fingerprint)
   useEffect(() => {
@@ -114,6 +118,22 @@ export function AlertsTemplate(props: Props) {
           <div className="text-muted-foreground">/</div>
           <div>
             {view.name ? view.name : viewName}
+          </div>
+          <div className="inline-flex ml-2 h-8 items-center justify-center rounded-md bg-accent p-1 text-accent-foreground">
+            <button
+              data-state={alertState === 'inactive' ? '' : 'active'}
+              onClick={() => {setAlertState('active')}}
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-0.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+            >
+              Active
+            </button>
+            <button
+              data-state={alertState === 'inactive' ? 'active' : ''}
+              onClick={() => {setAlertState('inactive')}}
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-0.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+            >
+              Inactive
+            </button>
           </div>
           <div>
             {

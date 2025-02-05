@@ -2,8 +2,6 @@ import { Alert } from "@/types/alertmanager"
 import { LabelFilter } from "./types"
 import { createParser } from "nuqs"
 
-const showOnlyActive = true
-
 const filterRegex = /(?<label>\w+)(?<pattern>|!=|=~|!~|=)(?<value>[^!=~]+)/
 
 export function parseFilter(filterStr: string): LabelFilter {
@@ -55,9 +53,6 @@ export function flattenAlerts(alerts: Record<string, Alert[]>): Alert[] {
 export function alertFilter(filters: LabelFilter[], matchAll = true): (alert: Alert) => boolean {
   return (alert: Alert) => {
     const matches = filters.map(filter => {
-      if (showOnlyActive && alert.status.state !== 'active') {
-        return false
-      }
       const value = alert.labels[filter.label]
       if (filter.value.length === 0) {
         return true
