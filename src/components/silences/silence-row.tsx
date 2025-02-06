@@ -1,9 +1,9 @@
-import { useAlerts } from "@/contexts/alerts";
-import { Silence } from "@/types/alertmanager";
-import { formatDistanceToNowStrict } from "date-fns";
-import Link from "next/link";
-import { matchAlerts } from "./utils";
-import { cn } from "@/lib/utils";
+import { useAlerts } from "@/contexts/alerts"
+import { Silence } from "@/types/alertmanager"
+import { formatDistanceToNowStrict } from "date-fns"
+import Link from "next/link"
+import { matchAlerts } from "./utils"
+import { cn } from "@/lib/utils"
 
 function paramsWithSilence(id: string) {
   const params = new URLSearchParams(window.location.search)
@@ -26,7 +26,7 @@ export function SilenceRow({ silence, cluster }: { silence: Silence, cluster: st
       <div className="text-sm max-w-[300px] font-medium truncate group-hover:text-blue-500 dark:group-hover:text-blue-300">
         {silence.comment}
       </div>
-      <div className="text-xs text-muted-foreground truncate hidden sm:block">
+      <div className="text-xs text-muted-foreground truncate">
         {silence.createdBy}
       </div>
       <div className="grow" />
@@ -52,7 +52,7 @@ export function SilenceRow({ silence, cluster }: { silence: Silence, cluster: st
 
 function SilenceMatchers({ silence }: { silence: Silence }) {
   const matchers = silence.matchers.map((matcher) => {
-    const operator = matcher.isRegex ? (matcher.isEqual ? '=~' : '!~') : (matcher.isEqual ? '=' : '!=');
+    const operator = matcher.isRegex ? (matcher.isEqual ? '=~' : '!~') : (matcher.isEqual ? '=' : '!=')
     return `${matcher.name}${operator}${matcher.value}`
   })
 
@@ -88,18 +88,19 @@ function SilenceMatchers({ silence }: { silence: Silence }) {
 }
 
 function getColorClass(endsAt: string) {
-  const endTime = new Date(endsAt).getTime();
-  const now = Date.now();
-  const oneHour = 60 * 60 * 1000;
-  const oneDay = 24 * 60 * 60 * 1000;
+  const timeLeft = new Date(endsAt).getTime() - Date.now()
 
-  if (endTime - now < oneHour) {
-    return 'bg-emerald-300';
-  } else if (endTime - now > 7 * oneDay) {
-    return 'bg-purple-400';
-  } else if (endTime - now > oneDay) {
-    return 'bg-blue-400';
+  const oneHour = 60 * 60 * 1000
+  const oneDay = 24 * 60 * 60 * 1000
+  const oneWeek = 7 * 24 * 60 * 60 * 1000
+
+  if (timeLeft > oneWeek) {
+    return 'bg-purple-400'
+  } else if (timeLeft > oneDay) {
+    return 'bg-blue-500'
+  } else if (timeLeft > oneHour) {
+    return 'bg-blue-400'
   } else {
-    return 'bg-teal-300';
+    return 'bg-cyan-300'
   }
 }
