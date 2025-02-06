@@ -46,8 +46,9 @@ export function SilenceModal(props: Props) {
       <SheetContent className="w-screen">
         <div className="flex flex-col h-screen">
           <SheetHeader className="shrink-0">
-            <SheetTitle>
-              Silence details {cluster}
+            <SheetTitle className="flex items-baseline gap-2">
+              <span>Silence</span>
+              <span className="font-mono font-medium text-sm">{silence?.id}</span>
             </SheetTitle>
             {/* <SheetDescription className="text-left">
               {silence?.comment}
