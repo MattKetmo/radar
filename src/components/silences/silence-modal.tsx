@@ -55,7 +55,7 @@ export function SilenceModal(props: Props) {
             </SheetDescription> */}
           </SheetHeader>
 
-          <div className="overflow-auto pb-10">
+          <div className="overflow-auto px-6 pb-10">
             {
               silence && (
                 <>

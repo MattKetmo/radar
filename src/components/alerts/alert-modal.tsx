@@ -2,16 +2,6 @@
 
 import { useMemo, useState } from "react"
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
-import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -61,7 +51,7 @@ export function AlertModal(props: Props) {
             </SheetDescription>
           </SheetHeader>
 
-          <div className="overflow-auto pb-10">
+          <div className="overflow-auto pb-10 px-6">
             {
               alert && (
                 <>

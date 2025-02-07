@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from "react"
 import Link from "next/link"
 import { Bell, ChevronRight, CircleSlash2, MessageCircleQuestion, Settings2, SquareArrowOutUpRight, SquareDot } from "lucide-react"
 import {
@@ -128,7 +127,7 @@ export function AppSidebar() {
                         {views.map(({ handle, view }) => (
                           <SidebarMenuItem key={handle}>
                             <SidebarMenuButton asChild isActive={pathname === `/alerts/${handle}`}>
-                              <Link href={`/alerts/${handle}`}>
+                              <Link href={`/alerts/${handle}`} onClick={() => setOpenMobile(false)}>
                                 <div className="flex items-baseline gap-2 w-full pr-12">
                                   <span className="truncate grow">{view.name || handle}</span>
                                 </div>
@@ -147,7 +146,7 @@ export function AppSidebar() {
               {uncategorizedViews.map(({ handle, view }) => (
                 <SidebarMenuItem key={handle}>
                   <SidebarMenuButton asChild>
-                    <Link href={`/alerts/${handle}`}>
+                    <Link href={`/alerts/${handle}`} onClick={() => setOpenMobile(false)}>
                       <div className="flex items-baseline gap-2 w-full pr-12">
                         <span className="truncate grow">{view.name || handle}</span>
                       </div>

@@ -116,21 +116,21 @@ export function AlertsTemplate(props: Props) {
             Alerts
           </div>
           <div className="text-muted-foreground">/</div>
-          <div>
+          <div  className='truncate'>
             {view.name ? view.name : viewName}
           </div>
-          <div className="inline-flex ml-2 h-8 items-center justify-center rounded-md bg-accent p-1 text-accent-foreground">
+          <div className="hidden sm:inline-flex ml-2 h-8 items-center justify-center rounded-md bg-accent p-1 text-accent-foreground">
             <button
               data-state={alertState === 'inactive' ? '' : 'active'}
               onClick={() => {setAlertState('active')}}
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-0.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-0.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border/20"
             >
               Active
             </button>
             <button
               data-state={alertState === 'inactive' ? 'active' : ''}
               onClick={() => {setAlertState('inactive')}}
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-0.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-0.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border/20"
             >
               Inactive
             </button>
