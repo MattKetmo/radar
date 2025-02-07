@@ -52,6 +52,9 @@ export function flattenAlerts(alerts: Record<string, Alert[]>): Alert[] {
 
 export function alertFilter(filters: LabelFilter[], matchAll = true): (alert: Alert) => boolean {
   return (alert: Alert) => {
+    if (filters.length === 0) {
+      return true
+    }
     const matches = filters.map(filter => {
       const value = alert.labels[filter.label]
       if (filter.value.length === 0) {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { notFound } from 'next/navigation'
 import { parseAsArrayOf, useQueryState } from 'nuqs'
-import { ListFilter, LoaderCircle, RefreshCcw, TriangleAlert } from 'lucide-react'
+import { ListFilter, LoaderCircle, RefreshCcw, TriangleAlert, XIcon } from 'lucide-react'
 import { ViewConfig } from '@/config/types'
 import { useAlerts } from '@/contexts/alerts'
 import { useConfig } from '@/contexts/config'
@@ -41,7 +41,7 @@ export function AlertsTemplate(props: Props) {
   const [flattenedAlerts, setFlattenedAlerts] = useState<Alert[]>([])
   const [view, setView] = useState<ViewConfig | null>(null)
   const [alertGroups, setAlertGroups] = useState<Group[]>([])
-  const [filters] = useQueryState('filters', parseAsArrayOf(parseAsFilter, ';'))
+  const [filters, setFilters] = useQueryState('filters', parseAsArrayOf(parseAsFilter, ';'))
   const [filterMatch] = useQueryState('match', { defaultValue: 'all' })
   const [alertState, setAlertState] = useQueryState('state', { defaultValue: 'active' })
 
@@ -62,7 +62,7 @@ export function AlertsTemplate(props: Props) {
     const flatAlerts = Object.values(alerts)
       .reduce((acc, val) => acc.concat(val), [])
       .filter(alertFilter(view.filters, view.filtersMatch === 'all'))
-      .filter(alertFilter(filters || [], filterMatch === 'all'))
+      .filter(alertFilter(filters || [], filterMatch !== 'any'))
     flatAlerts.sort(alertSort)
 
     setFlattenedAlerts(flatAlerts)
@@ -73,13 +73,13 @@ export function AlertsTemplate(props: Props) {
       flatAlerts
         .filter((alert) => filterActive ? alert.status.state === 'active' : alert.status.state !== 'active')
         .reduce((acc: Record<string, Alert[]>, alert: Alert) => {
-        const cluster = alert.labels[groupBy]
-        if (!acc[cluster]) {
-          acc[cluster] = []
-        }
-        acc[cluster].push(alert)
-        return acc
-      }, {})
+          const cluster = alert.labels[groupBy]
+          if (!acc[cluster]) {
+            acc[cluster] = []
+          }
+          acc[cluster].push(alert)
+          return acc
+        }, {})
     ).map(([name, alerts]) => ({ name, alerts }))
     alertGroups.sort((a, b) => {
       return a.name.localeCompare(b.name)
@@ -116,20 +116,20 @@ export function AlertsTemplate(props: Props) {
             Alerts
           </div>
           <div className="text-muted-foreground">/</div>
-          <div  className='truncate'>
+          <div className='truncate'>
             {view.name ? view.name : viewName}
           </div>
           <div className="hidden sm:inline-flex ml-2 h-8 items-center justify-center rounded-md bg-accent p-1 text-accent-foreground">
             <button
               data-state={alertState === 'inactive' ? '' : 'active'}
-              onClick={() => {setAlertState('active')}}
+              onClick={() => { setAlertState('active') }}
               className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-0.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border/20"
             >
               Active
             </button>
             <button
               data-state={alertState === 'inactive' ? 'active' : ''}
-              onClick={() => {setAlertState('inactive')}}
+              onClick={() => { setAlertState('inactive') }}
               className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-0.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border/20"
             >
               Inactive
@@ -200,22 +200,7 @@ export function AlertsTemplate(props: Props) {
       </AppHeader>
 
       <div className="flex text-sm items-center px-2 lg:px-6 border-b w-full min-h-[45px] shrink-0 bg-400">
-        <div className='-ml-2'>
-          <Button
-            variant="secondary"
-            size="sm"
-            disabled
-            className="h-[30px] w-full justify-between bg-background px-3 font-normal hover:bg-background"
-          >
-            <ListFilter
-              size={16}
-              strokeWidth={2}
-              className="shrink-0 text-muted-foreground/80"
-              aria-hidden="true"
-            />
-            <span>Filters</span>
-          </Button>
-        </div>
+        <AlertFilters filters={filters || []} setFilters={setFilters} />
         <div className='grow' />
         <div className='flex items-center'>
           <GroupSelect labels={labels} defaultValue={view.groupBy} />
@@ -248,4 +233,54 @@ export function AlertsTemplate(props: Props) {
       <AlertModal alert={selectedAlert} />
     </div>
   )
+}
+
+type AlertFiltersProps = {
+  filters: LabelFilter[]
+  setFilters: (value: LabelFilter[]) => void
+}
+
+function AlertFilters(props: AlertFiltersProps) {
+  const { filters } = props
+
+  // No filters, display the filters button
+  if (filters.length === 0) {
+    return (
+      <div className='-ml-2'>
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled
+          className="h-[30px] w-full justify-between bg-background px-3 font-normal hover:bg-secondary"
+        >
+          <ListFilter
+            size={16}
+            strokeWidth={2}
+            className="shrink-0 text-muted-foreground/80"
+            aria-hidden="true"
+          />
+          <span>Filters</span>
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <div className='gap-2 flex items-center'>
+      {filters.map((filter, i) => (
+        <div key={i} className="flex items-center px-2 py-0.5 bg-secondary rounded-sm shadow-sm border-border/20">
+          <span className="font-semibold font-mono">{filter.label}</span>
+          <span className="text-muted-foreground">{filterOperand(!filter.exclude, filter.regex)}</span>
+          <span className="truncate">{filter.value}</span>
+          <button className="ml-1" title="Remove filter" onClick={() => props.setFilters(filters.filter((_, j) => i !== j))}>
+            <XIcon size={14} className="text-muted-foreground" />
+          </button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function filterOperand(isEqual: boolean, isRegex: boolean) {
+  return isRegex ? (isEqual ? '=~' : '!~') : (isEqual ? '=' : '!=')
 }
