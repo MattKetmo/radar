@@ -57,21 +57,21 @@ export function AlertsTemplate(props: Props) {
     }
 
     const groupBy = group !== '' ? group : view.groupBy
+    const filterActive = alertState !== 'inactive'
 
     // Flatten, filter & sort alerts
     const flatAlerts = Object.values(alerts)
       .reduce((acc, val) => acc.concat(val), [])
       .filter(alertFilter(view.filters, view.filtersMatch === 'all'))
       .filter(alertFilter(filters || [], filterMatch !== 'any'))
+      .filter((alert) => filterActive ? alert.status.state === 'active' : alert.status.state !== 'active')
     flatAlerts.sort(alertSort)
 
     setFlattenedAlerts(flatAlerts)
 
     // Group alerts by specified field
-    const filterActive = alertState !== 'inactive'
     const alertGroups: Group[] = Object.entries(
       flatAlerts
-        .filter((alert) => filterActive ? alert.status.state === 'active' : alert.status.state !== 'active')
         .reduce((acc: Record<string, Alert[]>, alert: Alert) => {
           const cluster = alert.labels[groupBy]
           if (!acc[cluster]) {
