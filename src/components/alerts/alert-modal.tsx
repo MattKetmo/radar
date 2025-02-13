@@ -148,7 +148,7 @@ function AlertLabels(props: { alert: Alert }) {
           </span>
         ))}
       </div>
-      {Object.keys(alert.labels).length > 10 && (
+      {Object.keys(alert.labels).length > defaultLength && (
         <button className="text-xs mt-2 text-blue-500 focus:outline-0" onClick={() => setExpanded(e => !e)}>
           {expanded ? 'show less' : 'show more'}
         </button>
