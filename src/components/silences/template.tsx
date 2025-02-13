@@ -8,6 +8,7 @@ import { SilenceModal } from './silence-modal'
 import { useEffect, useState } from 'react'
 import { Silence } from '@/types/alertmanager'
 import { useQueryState } from 'nuqs'
+import { useHotkeys } from 'react-hotkeys-hook'
 
 export default function SilencesTemplate() {
   const {
@@ -18,6 +19,8 @@ export default function SilencesTemplate() {
     refreshInterval,
     setRefreshInterval,
   } = useSilences()
+
+  useHotkeys('r', () => refreshSilences(), []);
 
   const [selectedSilence, setSelectedSilence] = useState<Silence | null>(null)
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null)

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react'
 import { Config } from '@/config/types'
+import Loading from '@/components/layout/loading'
 
 interface ConfigContextProps {
   config: Config
@@ -36,7 +37,7 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
   }
 
   if (config === null) {
-    return <div>Loading...</div>
+    return <Loading />
   }
 
   return (
