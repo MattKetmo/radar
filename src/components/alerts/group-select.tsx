@@ -56,7 +56,7 @@ export default function GroupSelect(props: Props) {
             size="sm"
             role="combobox"
             aria-expanded={open}
-            className="h-[30px] w-full justify-between bg-background px-3 font-normal hover:bg-background"
+            className="h-[30px] min-w-[120px] w-full justify-between bg-background px-3 font-normal hover:bg-background"
           >
             <span className={cn("truncate", !value && "text-muted-foreground")}>
               {value

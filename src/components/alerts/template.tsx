@@ -11,7 +11,7 @@ import AppHeader from '@/components/layout/app-header'
 import { Button } from '@/components/ui/button'
 import { Alert } from '@/types/alertmanager'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { AlertGroups } from './alert-groups'
+import { AlertGroups, AlertGroupsSkeleton } from './alert-groups'
 import { AlertModal } from './alert-modal'
 import { Group, LabelFilter } from './types'
 import { alertFilter, alertSort, parseAsFilter } from './utils'
@@ -208,12 +208,14 @@ export function AlertsTemplate(props: Props) {
       </div>
 
       <div className="overflow-x-clip overflow-y-auto">
-        <AlertGroups alertGroups={alertGroups} />
+        {loading && (
+          <AlertGroupsSkeleton />
+        ) ||
+          <AlertGroups alertGroups={alertGroups} />
+        }
 
         <footer className="my-6 text-xs flex gap-2 justify-center text-muted-foreground">
-          {loading && (
-            <span>loading...</span>
-          ) || (
+          {loading || (
               <>
                 <span>
                   Total of <span className="font-semibold">{flattenedAlerts.length} alerts</span> displayed.

@@ -16,6 +16,15 @@ type AlertGroupsProps = {
   alertGroups: Group[]
 }
 
+export function AlertGroupsSkeleton() {
+  return (
+    <>
+      <div className="sticky z-10 top-0 bg-accent group cursor-pointer h-[40px] px-6 text-sm flex items-center border-b" />
+      <div className="border-b h-[45px] flex items-center px-6" />
+    </>
+  )
+}
+
 export function AlertGroups(props: AlertGroupsProps) {
   const { alertGroups } = props
 
