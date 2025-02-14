@@ -19,6 +19,14 @@ type AlertGroupsProps = {
 export function AlertGroups(props: AlertGroupsProps) {
   const { alertGroups } = props
 
+  if (alertGroups.length === 0) {
+    return (
+      <div className="text-lg items-center flex flex-col gap-4 text-muted-foreground h-[200px] justify-center border m-10 md:m-20 rounded-lg">
+        <p>Nothing to see here.</p>
+        <code>{`𐅁(⌐■_■)`}</code>
+      </div>
+    )
+  }
   return (
     <div>
       {alertGroups.map((alertGroup) => (
