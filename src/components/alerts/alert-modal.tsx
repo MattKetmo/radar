@@ -12,7 +12,9 @@ import { Alert } from "@/types/alertmanager"
 import { Check, ClipboardCopy, Square, SquareArrowOutUpRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { AlertSeverity } from "./alert-severity"
-import { useQueryState } from "nuqs"
+import { parseAsArrayOf, useQueryState } from "nuqs"
+import { parseAsFilter } from "./utils"
+import { LabelFilter } from "./types"
 
 function isURL(string: string): boolean {
   try {
@@ -31,8 +33,17 @@ export function AlertModal(props: Props) {
   const { alert } = props
   const { summary } = alert?.annotations || {}
   const [selectedAlertId, setSelectedAlertId] = useQueryState('alert', { defaultValue: '' })
+  const [filters, setFilters] = useQueryState(
+    "filters",
+    parseAsArrayOf(parseAsFilter, ";")
+  );
 
   const close = () => {
+    setSelectedAlertId(null)
+  }
+
+  const addFilter = (filter: LabelFilter) => {
+    setFilters([...(filters || []), filter])
     setSelectedAlertId(null)
   }
 
@@ -64,7 +75,7 @@ export function AlertModal(props: Props) {
                   </div>
 
                   <div className="mt-6">
-                    <AlertLabels alert={alert} />
+                    <AlertLabels alert={alert} addFilter={addFilter} />
                   </div>
 
                   <div className="mt-8">
@@ -119,8 +130,8 @@ function AlertAnnotations(props: { alert: Alert }) {
   )
 }
 
-function AlertLabels(props: { alert: Alert }) {
-  const { alert } = props
+function AlertLabels(props: { alert: Alert, addFilter: (filter: LabelFilter) => void }) {
+  const { alert, addFilter } = props
   const [expanded, setExpanded] = useState(false)
 
   const defaultLength = 12
@@ -140,11 +151,15 @@ function AlertLabels(props: { alert: Alert }) {
       </h3>
       <div className="text-sm mt-1 flex gap-2 flex-col">
         {Object.entries(alert.labels).sort().slice(0, expanded ? 100 : defaultLength).map(([key, value]) => (
-          <span key={key} className="truncate inline-flex gap-1 items-center leading-tight">
-            <span className="text-sm bg-secondary px-3 py-1 gap-1 items-center rounded-sm flex hover:border-primary">
+          <span key={key} className="truncate inline-flex gap-1 items-center leading-tight"
+          >
+            <button
+              className="text-sm bg-secondary px-3 py-1 gap-1 items-center rounded-sm flex hover:bg-primary/10"
+              onClick={() => addFilter({ label: key, value, exclude: false, regex: false })}
+            >
               <span onDoubleClick={selectElement} className="font-semibold font-mono">{key}: </span>
               <span onDoubleClick={selectElement}>{value}</span>
-            </span>
+            </button>
           </span>
         ))}
       </div>
