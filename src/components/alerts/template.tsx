@@ -208,7 +208,7 @@ export function AlertsTemplate(props: Props) {
       </div>
 
       <div className="overflow-x-clip overflow-y-auto">
-        {loading && (
+        {(alertGroups.length === 0 && loading) && (
           <AlertGroupsSkeleton />
         ) ||
           <AlertGroups alertGroups={alertGroups} />
