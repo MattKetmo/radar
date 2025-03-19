@@ -1,51 +1,60 @@
-'use client'
+"use client";
 
-import { useMemo, useState } from "react"
+import { useMemo, useState } from "react";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
-import { Alert } from "@/types/alertmanager"
-import { Check, ClipboardCopy, Square, SquareArrowOutUpRight } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { AlertSeverity } from "./alert-severity"
-import { parseAsArrayOf, useQueryState } from "nuqs"
-import { parseAsFilter } from "./utils"
-import { LabelFilter } from "./types"
+} from "@/components/ui/sheet";
+import { Alert } from "@/types/alertmanager";
+import {
+  Check,
+  CheckIcon,
+  ClipboardCopy,
+  SearchIcon,
+  Square,
+  SquareArrowOutUpRight,
+  ZoomInIcon,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { AlertSeverity } from "./alert-severity";
+import { parseAsArrayOf, useQueryState } from "nuqs";
+import { parseAsFilter } from "./utils";
+import { LabelFilter } from "./types";
 
 function isURL(string: string): boolean {
   try {
-    new URL(string)
-    return true
+    new URL(string);
+    return true;
   } catch (_) {
-    return false
+    return false;
   }
 }
 
 type Props = {
-  alert: Alert | null
-}
+  alert: Alert | null;
+};
 
 export function AlertModal(props: Props) {
-  const { alert } = props
-  const { summary } = alert?.annotations || {}
-  const [selectedAlertId, setSelectedAlertId] = useQueryState('alert', { defaultValue: '' })
+  const { alert } = props;
+  const { summary } = alert?.annotations || {};
+  const [selectedAlertId, setSelectedAlertId] = useQueryState("alert", {
+    defaultValue: "",
+  });
   const [filters, setFilters] = useQueryState(
     "filters",
     parseAsArrayOf(parseAsFilter, ";")
   );
 
   const close = () => {
-    setSelectedAlertId(null)
-  }
+    setSelectedAlertId(null);
+  };
 
   const addFilter = (filter: LabelFilter) => {
-    setFilters([...(filters || []), filter])
-    setSelectedAlertId(null)
-  }
+    setFilters([...(filters || []), filter]);
+  };
 
   return (
     <Sheet open={!!selectedAlertId} onOpenChange={close}>
@@ -57,84 +66,90 @@ export function AlertModal(props: Props) {
               {alert && <AlertSeverity alert={alert} />}
               {alert?.labels.alertname}
             </SheetTitle>
-            <SheetDescription className="text-left">
-              {summary}
-            </SheetDescription>
+            <SheetDescription className="text-left">{summary}</SheetDescription>
           </SheetHeader>
 
           <div className="overflow-auto pb-10 px-6">
-            {
-              alert && (
-                <>
-                  <div className="mt-4">
-                    <AlertDescription alert={alert} />
-                  </div>
+            {alert && (
+              <>
+                <div className="mt-4">
+                  <AlertDescription alert={alert} />
+                </div>
 
-                  <div className="mt-4">
-                    <AlertAnnotations alert={alert} />
-                  </div>
+                <div className="mt-4">
+                  <AlertAnnotations alert={alert} />
+                </div>
 
-                  <div className="mt-6">
-                    <AlertLabels alert={alert} addFilter={addFilter} />
-                  </div>
+                <div className="mt-6">
+                  <AlertLabels alert={alert} filters={filters || []} addFilter={addFilter} />
+                </div>
 
-                  <div className="mt-8">
-                    <AlertQuery alert={alert} />
-                  </div>
-                </>
-              )
-            }
+                <div className="mt-8">
+                  <AlertQuery alert={alert} />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </SheetContent>
-    </Sheet >
-  )
+    </Sheet>
+  );
 }
 
-
-
 function AlertDescription(props: { alert: Alert }) {
-  const { alert } = props
+  const { alert } = props;
 
-  if (!alert.annotations.description) return null
+  if (!alert.annotations.description) return null;
 
   return (
     <div className="bg-secondary p-4 rounded-lg">
       {alert.annotations.description}
     </div>
-  )
+  );
 }
 
 function AlertAnnotations(props: { alert: Alert }) {
-  const { alert } = props
-  const { summary, description, ...annotations } = alert.annotations
+  const { alert } = props;
+  const { summary, description, ...annotations } = alert.annotations;
 
   return (
     <div className="flex flex-col gap-2">
       {Object.entries(annotations).map(([key, value]) => (
         <div key={key} className="flex flex-col text-sm">
           {isURL(value) ? (
-            <a href={value} target="_blank" className="group shrink-0 gap-2 font-semibold font-mono text-blue-500 items-center flex">
-              <span className="group-hover:underline underline-offset-4">{key}</span>
+            <a
+              href={value}
+              target="_blank"
+              className="group shrink-0 gap-2 font-semibold font-mono text-blue-500 items-center flex"
+            >
+              <span className="group-hover:underline underline-offset-4">
+                {key}
+              </span>
               <SquareArrowOutUpRight size={12} />
             </a>
           ) : (
             <>
-              <div className="shrink-0 w-[100px] font-semibold font-mono">{key}</div>
+              <div className="shrink-0 w-[100px] font-semibold font-mono">
+                {key}
+              </div>
               <div>{value}</div>
             </>
           )}
         </div>
       ))}
     </div>
-  )
+  );
 }
 
-function AlertLabels(props: { alert: Alert, addFilter: (filter: LabelFilter) => void }) {
-  const { alert, addFilter } = props
-  const [expanded, setExpanded] = useState(false)
+function AlertLabels(props: {
+  alert: Alert;
+  filters: LabelFilter[];
+  addFilter: (filter: LabelFilter) => void;
+}) {
+  const { alert, filters, addFilter } = props;
+  const [expanded, setExpanded] = useState(false);
 
-  const defaultLength = 12
+  const defaultLength = 12;
 
   const selectElement = (e: React.MouseEvent<HTMLSpanElement>) => {
     const range = document.createRange();
@@ -142,74 +157,92 @@ function AlertLabels(props: { alert: Alert, addFilter: (filter: LabelFilter) => 
     const selection = window.getSelection();
     selection?.removeAllRanges();
     selection?.addRange(range);
-  }
+  };
 
   return (
     <div>
-      <h3 className="text-sm font-medium flex item-center gap-2">
-        Labels
-      </h3>
+      <h3 className="text-sm font-medium flex item-center gap-2">Labels</h3>
       <div className="text-sm mt-1 flex gap-2 flex-col">
-        {Object.entries(alert.labels).sort().slice(0, expanded ? 100 : defaultLength).map(([key, value]) => (
-          <span key={key} className="truncate inline-flex gap-1 items-center leading-tight"
-          >
-            <button
-              className="text-sm bg-secondary px-3 py-1 gap-1 items-center rounded-sm flex hover:bg-primary/10"
-              onClick={() => addFilter({ label: key, value, exclude: false, regex: false })}
+        {Object.entries(alert.labels)
+          .sort()
+          .slice(0, expanded ? 100 : defaultLength)
+          .map(([key, value]) => (
+            <span
+              key={key}
+              className="truncate inline-flex gap-1 items-center leading-tight"
             >
-              <span onDoubleClick={selectElement} className="font-semibold font-mono">{key}: </span>
-              <span onDoubleClick={selectElement}>{value}</span>
-            </button>
-          </span>
-        ))}
+              <span className="text-sm font-mono bg-secondary px-3 py-1 gap-1 items-center rounded-sm flex">
+                <span onDoubleClick={selectElement} className="font-semibold ">
+                  {key}:{" "}
+                </span>
+                <span onDoubleClick={selectElement}>{value}</span>
+              </span>
+              {filters.some(f => f.label === key && f.value === value && !f.exclude && !f.regex) ? (
+                <span className="ml-1 p-1 text-green-500">
+                  <CheckIcon size={14} />
+                </span>
+              ) : (
+                <button
+                  className="ml-1 hover:bg-primary/10 text-muted-foreground/50 hover:text-muted-foreground p-1 rounded-sm"
+                  onClick={() =>
+                    addFilter({ label: key, value, exclude: false, regex: false })
+                  }
+                >
+                  <ZoomInIcon size={14} />
+                </button>
+              )}
+            </span>
+          ))}
       </div>
       {Object.keys(alert.labels).length > defaultLength && (
-        <button className="text-xs mt-2 text-blue-500 focus:outline-0" onClick={() => setExpanded(e => !e)}>
-          {expanded ? 'show less' : 'show more'}
+        <button
+          className="text-xs mt-2 text-blue-500 focus:outline-0"
+          onClick={() => setExpanded((e) => !e)}
+        >
+          {expanded ? "show less" : "show more"}
         </button>
       )}
-    </div >
-  )
+    </div>
+  );
 }
 
 function AlertQuery(props: { alert: Alert }) {
-  const { alert } = props
-  const [copied, setCopied] = useState(false)
+  const { alert } = props;
+  const [copied, setCopied] = useState(false);
   const query = useMemo(() => {
-    if (!alert?.generatorURL) return null
+    if (!alert?.generatorURL) return null;
     try {
       // TODO: generatorURL can be a simply path, not a full URL (eg Loki alerts /explore?left={\"queries\":...})
-      const url = new URL(alert.generatorURL)
-      const g0Expr = url.searchParams.get("g0.expr")
-      return g0Expr ? decodeURIComponent(g0Expr) : null
+      const url = new URL(alert.generatorURL);
+      const g0Expr = url.searchParams.get("g0.expr");
+      return g0Expr ? decodeURIComponent(g0Expr) : null;
     } catch {
-      return null
+      return null;
     }
-  }, [alert])
+  }, [alert]);
 
-  if (!query) return null
+  if (!query) return null;
 
   return (
     <div className="bg-accent p-4 rounded-sm">
       <div className="flex items-center text-xs">
-        <div className="grow ">
-          PromQL
-        </div>
+        <div className="grow ">PromQL</div>
         <button
-          className={cn("shrink-0 flex items-center gap-1", copied ? "text-green-500" : "hover:text-blue-500")}
+          className={cn(
+            "shrink-0 flex items-center gap-1",
+            copied ? "text-green-500" : "hover:text-blue-500"
+          )}
           onClick={() => {
-            navigator.clipboard.writeText(query)
-            setCopied(true)
-            setTimeout(() => setCopied(false), 1500)
+            navigator.clipboard.writeText(query);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
           }}
         >
           {copied ? <Check size={12} /> : <ClipboardCopy size={12} />}
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
-      <pre className="whitespace-pre-wrap overflow-auto mt-2">
-        {query}
-      </pre>
+      <pre className="whitespace-pre-wrap overflow-auto mt-2">{query}</pre>
     </div>
-  )
+  );
 }
