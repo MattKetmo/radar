@@ -72,7 +72,7 @@ export default function GroupSelect(props: Props) {
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-full min-w-[var(--radix-popper-anchor-width)] p-0"
+          className="w-full min-w-(--radix-popper-anchor-width) p-0"
           align="start"
         >
           <Command>

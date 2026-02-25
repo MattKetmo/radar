@@ -90,7 +90,7 @@ function AddFilterButton(props: {
           value={filterText}
           onChange={(e) => setFilterText(e.target.value)}
           placeholder="label=value"
-          className="px-2 py-1 text-sm border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
+          className="px-2 py-1 text-sm border rounded-sm focus:outline-hidden focus:ring-1 focus:ring-primary"
           autoFocus
           onBlur={() => setIsEditing(false)}
         />
@@ -159,13 +159,13 @@ function EditableFilterButton(props: {
 
     return (
       <div
-        className="flex items-center px-2 py-0.5 bg-secondary rounded-sm shadow-sm border-border/20"
+        className="flex items-center px-2 py-0.5 bg-secondary rounded-sm shadow-xs border-border/20"
       >
         {isEditing ? (
           <form onSubmit={handleSubmit} className="flex">
             <input
               autoFocus
-              className="bg-transparent outline-none w-full min-w-[150px]"
+              className="bg-transparent outline-hidden w-full min-w-[150px]"
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
               onBlur={(e) => handleSubmit(e)}

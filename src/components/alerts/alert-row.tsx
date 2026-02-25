@@ -103,7 +103,7 @@ function AlertLabels({ alert }: { alert: Alert }) {
   return (
     <div className="shrink truncate relative -mr-[0.2rem] hidden sm:block sm:max-w-[45%] md:max-w-auto">
       {/* {labels.length > 2 && (
-        <div className="absolute top-0 right-0 bottom-0 w-[30px] bg-gradient-to-r from-transparent to-background" />
+        <div className="absolute top-0 right-0 bottom-0 w-[30px] bg-linear-to-r from-transparent to-background" />
       )} */}
       <ul className="flex items-center gap-1">
         {labels.map(({ key, value }) => (
