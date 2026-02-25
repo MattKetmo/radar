@@ -5,7 +5,7 @@ const ClusterSchema = z.object({
     .string()
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Name must be alphanumeric with dashes'),
   endpoint: z.string(),
-  labels: z.record(z.string()),
+  labels: z.record(z.string(), z.string()),
 })
 
 export const ViewCategorySchema = z.object({
@@ -29,8 +29,8 @@ export const ViewsSchema = z.object({
 
 export const ConfigSchema = z.object({
   clusters: z.array(ClusterSchema),
-  viewCategories: z.record(ViewCategorySchema),
-  views: z.record(ViewsSchema),
+  viewCategories: z.record(z.string(), ViewCategorySchema),
+  views: z.record(z.string(), ViewsSchema),
 })
 
 export type ClusterConfig = z.infer<typeof ClusterSchema>

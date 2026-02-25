@@ -2,8 +2,8 @@ import { isEqual } from "date-fns";
 import { z } from "zod";
 
 export const AlertSchema = z.object({
-  labels: z.record(z.string()),
-  annotations: z.record(z.string()),
+  labels: z.record(z.string(), z.string()),
+  annotations: z.record(z.string(), z.string()),
   startsAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/), // ISO 8601 format
   endsAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/),
   generatorURL: z.string(),
