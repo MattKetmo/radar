@@ -50,7 +50,7 @@ export const SilencesProvider = ({ children }: { children: ReactNode }) => {
 
       const parsedData = z.array(SilenceSchema).safeParse(data);
       if (!parsedData.success) {
-        console.error(`invalid silence format`, parsedData.error.errors);
+        console.error(`invalid silence format`, parsedData.error.issues);
         throw new Error(`invalid silence format`);
       }
 
