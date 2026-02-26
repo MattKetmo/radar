@@ -6,9 +6,10 @@ import { toast } from "sonner"
 import { useHotkeys } from "react-hotkeys-hook"
 
 import { SilenceCreateSchema } from "@/types/alertmanager"
-import type { MatcherOperator } from "@/types/alertmanager"
+import type { Alert, MatcherOperator, Silence } from "@/types/alertmanager"
 import { useConfig } from "@/contexts/config"
 import { useSilences } from "@/contexts/silences"
+import { useAlerts } from "@/contexts/alerts"
 import { useSilenceDialog } from "@/contexts/silence-dialog"
 import {
   Dialog,
@@ -22,9 +23,11 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { AlertSeverity } from "@/components/alerts/alert-severity"
 import { operatorToMatcher } from "./matcher-utils"
 import { MatcherBuilder } from "./matcher-builder"
 import { DurationPicker } from "./duration-picker"
+import { matchAlerts } from "./utils"
 
 type MatcherRow = {
   name: string
@@ -38,6 +41,7 @@ export function CreateSilenceDialog() {
   const { config } = useConfig()
   const { refreshSilences } = useSilences()
   const { isOpen, mode, prefillData, prefillClusters, openCreate, close } = useSilenceDialog()
+  const { alerts: cachedAlerts } = useAlerts()
 
   useHotkeys('n', () => openCreate(), { preventDefault: true })
 
@@ -54,6 +58,8 @@ export function CreateSilenceDialog() {
   const [comment, setComment] = useState("")
   const [silenceId, setSilenceId] = useState<string | undefined>(undefined)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
+  const [previewResults, setPreviewResults] = useState<Array<{ cluster: string; alerts: Alert[] }>>([])
 
   // Initialize form state when dialog opens
   useEffect(() => {
@@ -108,6 +114,38 @@ export function CreateSilenceDialog() {
         : [...prev, clusterName]
     )
   }, [])
+
+  const handlePreview = useCallback(() => {
+    const validMatchers = matchers.filter((m) => m.name.trim() !== "")
+
+    if (selectedClusters.length === 0 || validMatchers.length === 0) {
+      setPreviewResults([])
+      setShowPreview(true)
+      return
+    }
+
+    const mockSilence: Silence = {
+      id: "",
+      matchers: validMatchers.map((m) => ({
+        name: m.name,
+        value: m.value,
+        ...operatorToMatcher(m.operator),
+      })),
+      startsAt: "",
+      endsAt: "",
+      createdBy: "",
+      comment: "",
+      status: { state: "pending" },
+    }
+
+    const results = selectedClusters.map((cluster) => ({
+      cluster,
+      alerts: matchAlerts(mockSilence, cachedAlerts[cluster] || []),
+    }))
+
+    setPreviewResults(results)
+    setShowPreview(true)
+  }, [selectedClusters, matchers, cachedAlerts])
 
   const handleSubmit = useCallback(async () => {
     // Validate: at least one cluster
@@ -281,6 +319,72 @@ export function CreateSilenceDialog() {
               onEndsAtChange={setEndsAt}
             />
           </fieldset>
+
+          {/* Preview */}
+          <div className="space-y-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handlePreview}
+            >
+              Preview matching alerts
+            </Button>
+            {showPreview && (
+              <div className="space-y-2 rounded-md border p-3 text-sm">
+                {selectedClusters.length === 0 ? (
+                  <p className="text-muted-foreground">
+                    Select at least one cluster to preview
+                  </p>
+                ) : matchers.every((m) => !m.name.trim()) ? (
+                  <p className="text-muted-foreground">
+                    Add at least one matcher to preview
+                  </p>
+                ) : previewResults.every((r) => r.alerts.length === 0) ? (
+                  <p className="text-muted-foreground">No alerts matched</p>
+                ) : (
+                  <>
+                    {(() => {
+                      const total = previewResults.reduce(
+                        (s, r) => s + r.alerts.length,
+                        0
+                      )
+                      const clusters = previewResults.filter(
+                        (r) => r.alerts.length > 0
+                      ).length
+                      return (
+                        <p className="font-medium">
+                          {total} {total === 1 ? "alert" : "alerts"} matched
+                          {" "}across {clusters}{" "}
+                          {clusters === 1 ? "cluster" : "clusters"}
+                        </p>
+                      )
+                    })()}
+                    {previewResults
+                      .filter((r) => r.alerts.length > 0)
+                      .map((r) => (
+                        <div key={r.cluster} className="space-y-1">
+                          <p className="font-medium text-xs text-muted-foreground">
+                            {r.cluster}
+                          </p>
+                          <div className="space-y-1">
+                            {r.alerts.map((alert) => (
+                              <div
+                                key={alert.fingerprint}
+                                className="flex items-center gap-2"
+                              >
+                                <AlertSeverity alert={alert} />
+                                <span>{alert.labels.alertname}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Author */}
           <div className="space-y-2">
