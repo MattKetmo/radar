@@ -11,7 +11,7 @@ export async function resolveConfigFile(filenames: string[], directory: string):
       if (stat.isFile()) {
         return filepath
       }
-    } catch (_unused) { }
+    } catch { }
   }
   throw new Error('No config file found')
 }

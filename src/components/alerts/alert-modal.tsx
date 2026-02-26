@@ -26,7 +26,7 @@ function isURL(string: string): boolean {
   try {
     new URL(string);
     return true;
-  } catch (_unused) {
+  } catch {
     return false;
   }
 }
