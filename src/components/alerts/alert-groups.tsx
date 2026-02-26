@@ -5,10 +5,6 @@ import {
   Collapsible,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
 
 import { Alert } from "@/types/alertmanager"
 import { AlertRow } from "./alert-row"

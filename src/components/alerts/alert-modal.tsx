@@ -26,7 +26,7 @@ function isURL(string: string): boolean {
   try {
     new URL(string);
     return true;
-  } catch (_error) {
+  } catch (_unused) {
     return false;
   }
 }
@@ -108,7 +108,7 @@ function AlertDescription(props: { alert: Alert }) {
 
 function AlertAnnotations(props: { alert: Alert }) {
   const { alert } = props;
-  const { summary, description, ...annotations } = alert.annotations;
+  const { summary: _summary, description: _description, ...annotations } = alert.annotations;
 
   return (
     <div className="flex flex-col gap-2">
