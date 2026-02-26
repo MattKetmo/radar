@@ -1,35 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { notFound } from "next/navigation";
 import { parseAsArrayOf, useQueryState } from "nuqs";
-import {
-  LoaderCircle,
-  RefreshCcw,
-  TriangleAlert,
-} from "lucide-react";
 import { ViewConfig } from "@/config/types";
 import { useAlerts } from "@/contexts/alerts";
 import { useConfig } from "@/contexts/config";
 import AppHeader from "@/components/layout/app-header";
+import { RefreshControls } from "@/components/layout/refresh-controls";
+import { ListFooter } from "@/components/layout/list-footer";
 import { Alert } from "@/types/alertmanager";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { AlertGroups, AlertGroupsSkeleton } from "./alert-groups";
 import { AlertModal } from "./alert-modal";
-import { Group, LabelFilter } from "./types";
+import { Group } from "./types";
 import { alertFilter, alertSort, parseAsFilter } from "./utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import GroupSelect from "./group-select";
 import { useHotkeys } from "react-hotkeys-hook";
 import { AlertFilters } from "./alert-filters";
@@ -54,9 +38,7 @@ export function AlertsTemplate(props: Props) {
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [selectedAlertId] = useQueryState("alert", { defaultValue: "" });
   const [group] = useQueryState("group", { defaultValue: "" });
-  const [flattenedAlerts, setFlattenedAlerts] = useState<Alert[]>([]);
   const [view, setView] = useState<ViewConfig | null>(null);
-  const [alertGroups, setAlertGroups] = useState<Group[]>([]);
   const [filters, setFilters] = useQueryState(
     "filters",
     parseAsArrayOf(parseAsFilter, ";")
@@ -71,16 +53,14 @@ export function AlertsTemplate(props: Props) {
   // Load view config
   useEffect(() => setView(config.views[viewName]), [viewName, config]);
 
-  // Filter & group matching alerts
-  useEffect(() => {
+  // Filter & sort matching alerts
+  const flattenedAlerts = useMemo(() => {
     if (!view) {
-      return;
+      return [];
     }
 
-    const groupBy = group !== "" ? group : view.groupBy;
     const filterActive = alertState !== "inactive";
 
-    // Flatten, filter & sort alerts
     const flatAlerts = Object.values(alerts)
       .reduce((acc, val) => acc.concat(val), [])
       .filter(alertFilter(view.filters, view.filtersMatch === "all"))
@@ -92,11 +72,19 @@ export function AlertsTemplate(props: Props) {
       );
     flatAlerts.sort(alertSort);
 
-    setFlattenedAlerts(flatAlerts);
+    return flatAlerts;
+  }, [alerts, view, filters, filterMatch, alertState]);
 
-    // Group alerts by specified field
-    const alertGroups: Group[] = Object.entries(
-      flatAlerts.reduce((acc: Record<string, Alert[]>, alert: Alert) => {
+  // Group alerts by specified field
+  const alertGroups = useMemo(() => {
+    if (!view) {
+      return [];
+    }
+
+    const groupBy = group !== "" ? group : view.groupBy;
+
+    const groups: Group[] = Object.entries(
+      flattenedAlerts.reduce((acc: Record<string, Alert[]>, alert: Alert) => {
         const cluster = alert.labels[groupBy];
         if (!acc[cluster]) {
           acc[cluster] = [];
@@ -105,11 +93,12 @@ export function AlertsTemplate(props: Props) {
         return acc;
       }, {})
     ).map(([name, alerts]) => ({ name, alerts }));
-    alertGroups.sort((a, b) => {
+    groups.sort((a, b) => {
       return a.name.localeCompare(b.name);
     });
-    setAlertGroups(alertGroups);
-  }, [view, alerts, group, filters, filterMatch, alertState]);
+
+    return groups;
+  }, [flattenedAlerts, view, group]);
 
   // Select alert by ID (fingerprint)
   useEffect(() => {
@@ -130,9 +119,12 @@ export function AlertsTemplate(props: Props) {
     return notFound();
   }
 
-  const labels = Array.from(
-    new Set(flattenedAlerts.flatMap((alert) => Object.keys(alert.labels)))
-  ).sort();
+  const labels = useMemo(
+    () => Array.from(
+      new Set(flattenedAlerts.flatMap((alert) => Object.keys(alert.labels)))
+    ).sort(),
+    [flattenedAlerts]
+  );
 
   if (!view) return null;
 
@@ -143,8 +135,10 @@ export function AlertsTemplate(props: Props) {
           <div className="font-medium">Alerts</div>
           <div className="text-muted-foreground">/</div>
           <div className="truncate">{view.name ? view.name : viewName}</div>
-          <div className="hidden sm:inline-flex ml-2 h-8 items-center justify-center rounded-md bg-accent p-1 text-accent-foreground">
+          <div className="hidden sm:inline-flex ml-2 h-8 items-center justify-center rounded-md bg-accent p-1 text-accent-foreground" role="tablist">
             <button
+              role="tab"
+              aria-selected={alertState === 'active'}
               data-state={alertState === "inactive" ? "" : "active"}
               onClick={() => {
                 setAlertState("active");
@@ -154,6 +148,8 @@ export function AlertsTemplate(props: Props) {
               Active
             </button>
             <button
+              role="tab"
+              aria-selected={alertState === 'inactive'}
               data-state={alertState === "inactive" ? "active" : ""}
               onClick={() => {
                 setAlertState("inactive");
@@ -163,68 +159,13 @@ export function AlertsTemplate(props: Props) {
               Inactive
             </button>
           </div>
-          <div>
-            {!loading && Object.entries(errors).length > 0 && (
-              <TooltipProvider delayDuration={150}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TriangleAlert size={16} className="text-orange-500" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <ul>
-                      {Object.entries(errors).map(([cluster, message]) => (
-                        <li key={cluster}>
-                          <span className="font-semibold">{cluster}</span>:{" "}
-                          {message}
-                        </li>
-                      ))}
-                    </ul>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </div>
-
-          <div className="grow" />
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                disabled={loading}
-                onClick={() => refreshAlerts()}
-                className={
-                  loading ? "cursor-not-allowed text-muted-foreground " : ""
-                }
-              >
-                {(loading && (
-                  <LoaderCircle size={16} className="animate-[spin_1s]" />
-                )) || <RefreshCcw size={16} />}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="left" className="flex items-center gap-2">
-              <span>Refresh</span>
-              <span className="font-mono flex items-center justify-center h-5 w-5 text-muted-foreground border-muted-foreground border rounded-sm">
-                R
-              </span>
-            </TooltipContent>
-          </Tooltip>
-
-          <div>
-            <Select
-              value={`${refreshInterval}`}
-              onValueChange={(value) => setRefreshInterval(Number(value))}
-            >
-              <SelectTrigger className="w-[80px] h-[30px]">
-                <SelectValue placeholder="Refresh" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">Off</SelectItem>
-                <SelectItem value="10">10s</SelectItem>
-                <SelectItem value="30">30s</SelectItem>
-                <SelectItem value="60">60s</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <RefreshControls
+            loading={loading}
+            errors={errors}
+            refreshInterval={refreshInterval}
+            onRefresh={refreshAlerts}
+            onRefreshIntervalChange={setRefreshInterval}
+          />
         </div>
       </AppHeader>
 
@@ -241,26 +182,12 @@ export function AlertsTemplate(props: Props) {
           <AlertGroups alertGroups={alertGroups} />
         )}
 
-        <footer className="my-6 text-xs flex gap-2 justify-center text-muted-foreground">
-          {loading || (
-            <>
-              <span>
-                Total of{" "}
-                <span className="font-semibold">
-                  {flattenedAlerts.length} alerts
-                </span>{" "}
-                displayed.
-              </span>
-              <button
-                disabled={loading}
-                onClick={() => refreshAlerts()}
-                className="font-semibold hover:underline underline-offset-2"
-              >
-                Refresh
-              </button>
-            </>
-          )}
-        </footer>
+        <ListFooter
+          count={flattenedAlerts.length}
+          loading={loading}
+          onRefresh={refreshAlerts}
+          label="alerts"
+        />
       </div>
 
       <AlertModal alert={selectedAlert} />

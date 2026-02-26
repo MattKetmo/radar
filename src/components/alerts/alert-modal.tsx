@@ -13,8 +13,6 @@ import {
   Check,
   CheckIcon,
   ClipboardCopy,
-  SearchIcon,
-  Square,
   SquareArrowOutUpRight,
   ZoomInIcon,
 } from "lucide-react";
@@ -28,7 +26,7 @@ function isURL(string: string): boolean {
   try {
     new URL(string);
     return true;
-  } catch (_) {
+  } catch {
     return false;
   }
 }
@@ -39,7 +37,8 @@ type Props = {
 
 export function AlertModal(props: Props) {
   const { alert } = props;
-  const { summary } = alert?.annotations || {};
+
+  const { summary: _summary, description: _description } = alert?.annotations || {};
   const [selectedAlertId, setSelectedAlertId] = useQueryState("alert", {
     defaultValue: "",
   });
@@ -58,7 +57,6 @@ export function AlertModal(props: Props) {
 
   return (
     <Sheet open={!!selectedAlertId} onOpenChange={close}>
-      {/* <SheetTrigger>Open</SheetTrigger> */}
       <SheetContent className="w-screen">
         <div className="flex flex-col h-screen">
           <SheetHeader className="shrink-0">
@@ -66,7 +64,7 @@ export function AlertModal(props: Props) {
               {alert && <AlertSeverity alert={alert} />}
               {alert?.labels.alertname}
             </SheetTitle>
-            <SheetDescription className="text-left">{summary}</SheetDescription>
+            <SheetDescription className="text-left">{_summary}</SheetDescription>
           </SheetHeader>
 
           <div className="overflow-auto pb-10 px-6">
@@ -110,7 +108,7 @@ function AlertDescription(props: { alert: Alert }) {
 
 function AlertAnnotations(props: { alert: Alert }) {
   const { alert } = props;
-  const { summary, description, ...annotations } = alert.annotations;
+  const { summary: _summary, description: _description, ...annotations } = alert.annotations;
 
   return (
     <div className="flex flex-col gap-2">
@@ -212,9 +210,17 @@ function AlertQuery(props: { alert: Alert }) {
   const query = useMemo(() => {
     if (!alert?.generatorURL) return null;
     try {
-      // TODO: generatorURL can be a simply path, not a full URL (eg Loki alerts /explore?left={\"queries\":...})
-      const url = new URL(alert.generatorURL);
-      const g0Expr = url.searchParams.get("g0.expr");
+      let parsedUrl: URL | null = null;
+      try {
+        parsedUrl = new URL(alert.generatorURL);
+      } catch {
+        try {
+          parsedUrl = new URL(alert.generatorURL, window.location.origin);
+        } catch {
+          parsedUrl = null;
+        }
+      }
+      const g0Expr = parsedUrl?.searchParams.get("g0.expr");
       return g0Expr ? decodeURIComponent(g0Expr) : null;
     } catch {
       return null;

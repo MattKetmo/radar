@@ -21,7 +21,11 @@ export function SilenceRow({ silence, cluster }: { silence: Silence, cluster: st
       className="flex gap-2 xl:gap-4 items-center px-6 h-[45px] border-b group cursor-pointer"
     >
       <div className='shrink-0'>
-        <div className={`w-3 h-3 rounded-full ${getColorClass(silence.endsAt)}`} />
+        <div
+          className={`w-3 h-3 rounded-full ${getColorClass(silence.endsAt)}`}
+          aria-label={`Status: ${getStatusLabel(silence.endsAt)}`}
+          title={getStatusLabel(silence.endsAt)}
+        />
       </div>
       <div className="text-sm max-w-[300px] font-medium truncate group-hover:text-blue-500 dark:group-hover:text-blue-300">
         {silence.comment}
@@ -85,6 +89,24 @@ function SilenceMatchers({ silence }: { silence: Silence }) {
       </ul>
     </div>
   )
+}
+
+function getStatusLabel(endsAt: string) {
+  const timeLeft = new Date(endsAt).getTime() - Date.now()
+
+  const oneHour = 60 * 60 * 1000
+  const oneDay = 24 * 60 * 60 * 1000
+  const oneWeek = 7 * 24 * 60 * 60 * 1000
+
+  if (timeLeft > oneWeek) {
+    return 'Expires in more than a week'
+  } else if (timeLeft > oneDay) {
+    return 'Expires in more than a day'
+  } else if (timeLeft > oneHour) {
+    return 'Expires in less than a day'
+  } else {
+    return 'Expires soon'
+  }
 }
 
 function getColorClass(endsAt: string) {

@@ -1,0 +1,128 @@
+[
+  {
+    "id": "silence-001",
+    "matchers": [
+      {
+        "name": "alertname",
+        "value": "HighLatencyP99",
+        "isEqual": true,
+        "isRegex": false
+      },
+      {
+        "name": "namespace",
+        "value": "payments",
+        "isEqual": true,
+        "isRegex": false
+      }
+    ],
+    "startsAt": "2026-02-26T08:00:00.000Z",
+    "endsAt": "2026-02-27T08:00:00.000Z",
+    "createdBy": "oncall@example.com",
+    "comment": "Silencing payments latency alerts during database migration window",
+    "status": {
+      "state": "active"
+    }
+  },
+  {
+    "id": "silence-002",
+    "matchers": [
+      {
+        "name": "severity",
+        "value": "info|warning",
+        "isEqual": true,
+        "isRegex": true
+      },
+      {
+        "name": "namespace",
+        "value": "monitoring",
+        "isEqual": true,
+        "isRegex": false
+      }
+    ],
+    "startsAt": "2026-02-25T00:00:00.000Z",
+    "endsAt": "2026-02-25T23:59:59.000Z",
+    "createdBy": "platform-team@example.com",
+    "comment": "Maintenance window for monitoring stack upgrade",
+    "status": {
+      "state": "expired"
+    }
+  },
+  {
+    "id": "silence-003",
+    "matchers": [
+      {
+        "name": "alertname",
+        "value": "KubeJob.*",
+        "isEqual": true,
+        "isRegex": true
+      }
+    ],
+    "startsAt": "2026-02-26T03:00:00.000Z",
+    "endsAt": "2026-02-26T18:00:00.000Z",
+    "createdBy": "data-team@example.com",
+    "comment": "Silencing batch job alerts during scheduled data migration",
+    "status": {
+      "state": "active"
+    }
+  },
+  {
+    "id": "silence-004",
+    "matchers": [
+      {
+        "name": "alertname",
+        "value": "CertificateExpiringSoon",
+        "isEqual": true,
+        "isRegex": false
+      }
+    ],
+    "startsAt": "2026-02-20T10:00:00.000Z",
+    "endsAt": "2026-02-22T10:00:00.000Z",
+    "createdBy": "security@example.com",
+    "comment": "Certificate renewal in progress, suppressing until completion",
+    "status": {
+      "state": "expired"
+    }
+  },
+  {
+    "id": "silence-005",
+    "matchers": [
+      {
+        "name": "namespace",
+        "value": "search",
+        "isEqual": false,
+        "isRegex": false
+      }
+    ],
+    "startsAt": "2026-02-27T00:00:00.000Z",
+    "endsAt": "2026-02-27T06:00:00.000Z",
+    "createdBy": "sre-team@example.com",
+    "comment": "Pre-scheduled silence for planned maintenance on all namespaces except search",
+    "status": {
+      "state": "pending"
+    }
+  },
+  {
+    "id": "silence-006",
+    "matchers": [
+      {
+        "name": "severity",
+        "value": "critical",
+        "isEqual": true,
+        "isRegex": false
+      },
+      {
+        "name": "@cluster",
+        "value": "staging",
+        "isEqual": true,
+        "isRegex": false
+      }
+    ],
+    "startsAt": "2026-02-26T12:00:00.000Z",
+    "endsAt": "2026-02-26T20:00:00.000Z",
+    "createdBy": "dev-lead@example.com",
+    "comment": "Suppressing staging critical alerts during load testing",
+    "status": {
+      "state": "active"
+    }
+  }
+]

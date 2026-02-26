@@ -11,7 +11,7 @@ export async function resolveConfigFile(filenames: string[], directory: string):
       if (stat.isFile()) {
         return filepath
       }
-    } catch (error) { }
+    } catch { }
   }
   throw new Error('No config file found')
 }
@@ -36,7 +36,7 @@ export async function parseConfigFile(filepath: string): Promise<Config> {
   return parsedConfig
 }
 
-/* eslint @typescript-eslint/no-explicit-any: 0 */
+
 export function resolveEnvVars(obj: any): any {
   if (typeof obj === 'string') {
     return obj.replace(/\${([^}]+)}/g, (match, key) => {
@@ -55,7 +55,7 @@ export function resolveEnvVars(obj: any): any {
   }
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export const memoize = <T extends (...args: any[]) => Promise<any>>(fn: T) => {
   const cache = new Map<string, ReturnType<T>>()
   return async function (...args: Parameters<T>): Promise<ReturnType<T>> {
@@ -69,13 +69,17 @@ export const memoize = <T extends (...args: any[]) => Promise<any>>(fn: T) => {
   }
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export const deepMerge = <T extends { [key: string]: any }>(target: T, source: T): T => {
+  const result = { ...target } as Record<string, any>;
   for (const key of Object.keys(source)) {
-    if (source[key] instanceof Object && key in target) {
-      Object.assign(source[key], deepMerge(target[key], source[key]))
+    if (source[key] !== undefined) {
+      if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key])) {
+        result[key] = deepMerge(result[key] as Record<string, unknown>, source[key] as Record<string, unknown>);
+      } else {
+        result[key] = source[key];
+      }
     }
   }
-  Object.assign(target || {}, source)
-  return target
-}
+  return result as T;
+};

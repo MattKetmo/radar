@@ -1,12 +1,19 @@
 import { getConfig } from "@/config";
-import { Silence, SilenceSchema } from "@/types/alertmanager";
+import { SilenceSchema } from "@/types/alertmanager";
 import { z } from "zod";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(
   _: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const cluster = (await params).slug
+  
+  if (!cluster.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)) {
+    return new Response("Invalid cluster name", { status: 400 })
+  }
+  
   const config = await getConfig()
 
   const endpoint = config.clusters.find((c) => c.name === cluster)?.endpoint

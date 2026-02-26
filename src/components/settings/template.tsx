@@ -5,7 +5,7 @@ import ReactJson from 'react-json-view'
 import { useConfig } from "@/contexts/config"
 import ThemeSelect from "./theme-select"
 
-export function SettginsTemplate() {
+export function SettingsTemplate() {
   const { config } = useConfig()
   const { theme } = useTheme()
 

@@ -33,6 +33,7 @@ export function AlertSeverity({ alert }: { alert: Alert }) {
   return (
     <div
       title={severity}
+      aria-label={`Severity: ${severity}`}
       className={cn("text-center text-white text-xs px-1 py-1 rounded-sm shrink-0 font-mono w-12", color)}
     >
       {text}

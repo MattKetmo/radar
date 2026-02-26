@@ -1,4 +1,5 @@
 import { Alert } from "@/types/alertmanager"
+import { safeRegExp } from "@/lib/regexp"
 import { LabelFilter } from "./types"
 import { createParser } from "nuqs"
 
@@ -61,7 +62,10 @@ export function alertFilter(filters: LabelFilter[], matchAll = true): (alert: Al
         return true
       }
       if (filter.regex) {
-        const regex = new RegExp(Array.isArray(filter.value) ? filter.value.join('|') : filter.value)
+        const regex = safeRegExp(Array.isArray(filter.value) ? filter.value.join('|') : filter.value)
+        if (!regex) {
+          return filter.exclude
+        }
         if (filter.exclude) {
           return !regex.test(value)
         }
@@ -92,10 +96,6 @@ export function alertSort(a: Alert, b: Alert) {
   const severityB = severityOrder[b.labels.severity as keyof typeof severityOrder] || severityOrder.default
 
   if (severityA === severityB) {
-    // if (a.labels.alertname === b.labels.alertname) {
-    return new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime()
-    // }
-    // return a.labels.alertname.localeCompare(b.labels.alertname)
   }
 
   return severityA - severityB

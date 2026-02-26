@@ -10,7 +10,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   // Save the latest seen page to a cookie
   useEffect(() => {
     const path = `${pathname}${searchParams.toString() !== '' ? '?' + searchParams : ''}`
-    document.cookie = `latest_page=${path}; path=/;`
+    document.cookie = `latest_page=${path}; path=/; SameSite=Lax`
   }, [pathname, searchParams])
 
   return children

@@ -1,10 +1,19 @@
 import { getConfig } from "@/config";
+import { AlertSchema } from "@/types/alertmanager";
+import { z } from "zod";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(
   _: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const cluster = (await params).slug
+  
+  if (!cluster.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)) {
+    return new Response("Invalid cluster name", { status: 400 })
+  }
+  
   const config = await getConfig()
 
   const endpoint = config.clusters.find((c) => c.name === cluster)?.endpoint
@@ -30,7 +39,14 @@ export async function GET(
     }
 
     const data = await response.json();
-    return new Response(JSON.stringify(data), {
+    
+    const validationResult = z.array(AlertSchema).safeParse(data);
+    if (!validationResult.success) {
+      console.error("Validation failed", validationResult.error);
+      return new Response("Invalid alerts data", { status: 500 });
+    }
+    
+    return new Response(JSON.stringify(validationResult.data), {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {

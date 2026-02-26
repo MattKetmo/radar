@@ -1,4 +1,3 @@
-import { isEqual } from "date-fns";
 import { z } from "zod";
 
 export const AlertSchema = z.object({

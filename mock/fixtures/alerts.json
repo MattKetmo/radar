@@ -1,0 +1,371 @@
+[
+  {
+    "labels": {
+      "@cluster": "prod",
+      "alertname": "HighMemoryUsage",
+      "severity": "critical",
+      "namespace": "payments",
+      "job": "kube-state-metrics",
+      "instance": "10.0.1.12:8080"
+    },
+    "annotations": {
+      "summary": "Memory usage is above 95% on payments-api-7b9c4d5f6-xk2lm",
+      "description": "Pod payments-api-7b9c4d5f6-xk2lm in namespace payments is using 97% of its memory limit.",
+      "runbook_url": "https://runbooks.example.com/high-memory-usage"
+    },
+    "startsAt": "2026-02-26T08:15:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus.example.com/graph?g0.expr=container_memory_usage_bytes",
+    "fingerprint": "a1b2c3d4e5f60001",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "prod",
+      "alertname": "KubePodCrashLooping",
+      "severity": "critical",
+      "namespace": "checkout",
+      "job": "kube-state-metrics",
+      "instance": "10.0.1.12:8080"
+    },
+    "annotations": {
+      "summary": "Pod checkout-worker-5d8f9a3b1-mn4kp is crash looping",
+      "description": "Pod checkout-worker-5d8f9a3b1-mn4kp in namespace checkout has restarted 12 times in the last hour."
+    },
+    "startsAt": "2026-02-26T06:42:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus.example.com/graph?g0.expr=kube_pod_container_status_restarts_total",
+    "fingerprint": "a1b2c3d4e5f60002",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "prod",
+      "alertname": "HighErrorRate",
+      "severity": "critical",
+      "namespace": "api-gateway",
+      "job": "nginx-ingress",
+      "instance": "10.0.2.5:9113"
+    },
+    "annotations": {
+      "summary": "Error rate exceeds 5% on api-gateway ingress",
+      "description": "The 5xx error rate for api-gateway has been above 5% for the last 10 minutes."
+    },
+    "startsAt": "2026-02-26T10:30:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus.example.com/graph?g0.expr=rate(nginx_ingress_controller_requests{status=~\"5..\"}[5m])",
+    "fingerprint": "a1b2c3d4e5f60003",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "prod",
+      "alertname": "DiskSpaceRunningLow",
+      "severity": "warning",
+      "namespace": "monitoring",
+      "job": "node-exporter",
+      "instance": "10.0.3.8:9100"
+    },
+    "annotations": {
+      "summary": "Disk space below 15% on node ip-10-0-3-8",
+      "description": "Node ip-10-0-3-8 has only 12% disk space remaining on /dev/sda1."
+    },
+    "startsAt": "2026-02-25T18:00:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus.example.com/graph?g0.expr=node_filesystem_avail_bytes",
+    "fingerprint": "a1b2c3d4e5f60004",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "prod",
+      "alertname": "HighLatencyP99",
+      "severity": "warning",
+      "namespace": "payments",
+      "job": "payments-api",
+      "instance": "10.0.1.15:8080"
+    },
+    "annotations": {
+      "summary": "P99 latency above 2s for payments-api",
+      "description": "The 99th percentile latency for payments-api has exceeded 2 seconds for the last 15 minutes."
+    },
+    "startsAt": "2026-02-26T09:00:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus.example.com/graph?g0.expr=histogram_quantile(0.99,rate(http_request_duration_seconds_bucket[5m]))",
+    "fingerprint": "a1b2c3d4e5f60005",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": ["silence-001"],
+      "state": "suppressed"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "prod",
+      "alertname": "CertificateExpiringSoon",
+      "severity": "warning",
+      "namespace": "ingress",
+      "job": "cert-manager",
+      "instance": "10.0.1.20:9402"
+    },
+    "annotations": {
+      "summary": "TLS certificate for api.example.com expires in 7 days",
+      "description": "The TLS certificate for api.example.com will expire on 2026-03-05."
+    },
+    "startsAt": "2026-02-20T12:00:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus.example.com/graph?g0.expr=certmanager_certificate_expiration_timestamp_seconds",
+    "fingerprint": "a1b2c3d4e5f60006",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "prod",
+      "alertname": "KubeDeploymentReplicasMismatch",
+      "severity": "warning",
+      "namespace": "checkout",
+      "job": "kube-state-metrics",
+      "instance": "10.0.1.12:8080"
+    },
+    "annotations": {
+      "summary": "Deployment checkout-worker has 2/3 replicas available",
+      "description": "Deployment checkout-worker in namespace checkout has not matched the expected number of replicas for longer than 15 minutes."
+    },
+    "startsAt": "2026-02-26T06:50:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus.example.com/graph?g0.expr=kube_deployment_status_replicas_available",
+    "fingerprint": "a1b2c3d4e5f60007",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "prod",
+      "alertname": "Watchdog",
+      "severity": "none",
+      "namespace": "monitoring",
+      "job": "prometheus",
+      "instance": "10.0.1.10:9090"
+    },
+    "annotations": {
+      "summary": "Alerting pipeline is functional",
+      "description": "This is a Watchdog alert that ensures the alerting pipeline is functional."
+    },
+    "startsAt": "2026-01-01T00:00:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus.example.com/graph?g0.expr=vector(1)",
+    "fingerprint": "a1b2c3d4e5f60008",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "prod",
+      "alertname": "InfoInhibitor",
+      "severity": "none",
+      "namespace": "monitoring",
+      "job": "prometheus",
+      "instance": "10.0.1.10:9090"
+    },
+    "annotations": {
+      "summary": "Info-level alert inhibitor is active",
+      "description": "This alert is used to inhibit info-level alerts when there are critical or warning alerts firing."
+    },
+    "startsAt": "2026-01-01T00:00:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus.example.com/graph?g0.expr=vector(1)",
+    "fingerprint": "a1b2c3d4e5f60009",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "prod",
+      "alertname": "CPUThrottlingHigh",
+      "severity": "info",
+      "namespace": "payments",
+      "job": "kubelet",
+      "instance": "10.0.1.30:10250"
+    },
+    "annotations": {
+      "summary": "CPU throttling is high for payments-api container",
+      "description": "25% of CPU time is being throttled for container payments-api in pod payments-api-7b9c4d5f6-xk2lm."
+    },
+    "startsAt": "2026-02-26T07:30:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus.example.com/graph?g0.expr=rate(container_cpu_cfs_throttled_seconds_total[5m])",
+    "fingerprint": "a1b2c3d4e5f60010",
+    "status": {
+      "inhibitedBy": ["a1b2c3d4e5f60009"],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "staging",
+      "alertname": "KubePodCrashLooping",
+      "severity": "critical",
+      "namespace": "orders",
+      "job": "kube-state-metrics",
+      "instance": "10.1.0.5:8080"
+    },
+    "annotations": {
+      "summary": "Pod orders-api-8c7d6e5f4-ab3cd is crash looping",
+      "description": "Pod orders-api-8c7d6e5f4-ab3cd in namespace orders has restarted 8 times in the last hour."
+    },
+    "startsAt": "2026-02-26T11:20:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus-staging.example.com/graph?g0.expr=kube_pod_container_status_restarts_total",
+    "fingerprint": "b2c3d4e5f6a70001",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "staging",
+      "alertname": "HighMemoryUsage",
+      "severity": "warning",
+      "namespace": "search",
+      "job": "kube-state-metrics",
+      "instance": "10.1.0.5:8080"
+    },
+    "annotations": {
+      "summary": "Memory usage is above 80% on search-indexer-3a4b5c6d7-ef8gh",
+      "description": "Pod search-indexer-3a4b5c6d7-ef8gh in namespace search is using 85% of its memory limit."
+    },
+    "startsAt": "2026-02-26T09:45:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus-staging.example.com/graph?g0.expr=container_memory_usage_bytes",
+    "fingerprint": "b2c3d4e5f6a70002",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "staging",
+      "alertname": "KubeJobFailed",
+      "severity": "warning",
+      "namespace": "batch-jobs",
+      "job": "kube-state-metrics",
+      "instance": "10.1.0.5:8080"
+    },
+    "annotations": {
+      "summary": "Job data-migration-20260226 has failed",
+      "description": "Kubernetes job data-migration-20260226 in namespace batch-jobs has failed 3 times."
+    },
+    "startsAt": "2026-02-26T04:00:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus-staging.example.com/graph?g0.expr=kube_job_status_failed",
+    "fingerprint": "b2c3d4e5f6a70003",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": ["silence-003"],
+      "state": "suppressed"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "staging",
+      "alertname": "PrometheusTargetDown",
+      "severity": "info",
+      "namespace": "monitoring",
+      "job": "prometheus",
+      "instance": "10.1.0.10:9090"
+    },
+    "annotations": {
+      "summary": "Prometheus target node-exporter on 10.1.0.22 is down",
+      "description": "The node-exporter target at 10.1.0.22:9100 has been unreachable for 5 minutes."
+    },
+    "startsAt": "2026-02-26T12:00:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus-staging.example.com/graph?g0.expr=up==0",
+    "fingerprint": "b2c3d4e5f6a70004",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "staging",
+      "alertname": "Watchdog",
+      "severity": "none",
+      "namespace": "monitoring",
+      "job": "prometheus",
+      "instance": "10.1.0.10:9090"
+    },
+    "annotations": {
+      "summary": "Alerting pipeline is functional",
+      "description": "This is a Watchdog alert that ensures the alerting pipeline is functional."
+    },
+    "startsAt": "2026-01-01T00:00:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus-staging.example.com/graph?g0.expr=vector(1)",
+    "fingerprint": "b2c3d4e5f6a70005",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  },
+  {
+    "labels": {
+      "@cluster": "staging",
+      "alertname": "EtcdHighCommitDuration",
+      "severity": "warning",
+      "namespace": "kube-system",
+      "job": "etcd",
+      "instance": "10.1.0.3:2379"
+    },
+    "annotations": {
+      "summary": "Etcd commit duration is high on staging control plane",
+      "description": "The 99th percentile etcd commit duration has exceeded 150ms for 10 minutes."
+    },
+    "startsAt": "2026-02-26T13:10:00.000Z",
+    "endsAt": "0001-01-01T00:00:00.000Z",
+    "generatorURL": "http://prometheus-staging.example.com/graph?g0.expr=histogram_quantile(0.99,rate(etcd_disk_backend_commit_duration_seconds_bucket[5m]))",
+    "fingerprint": "b2c3d4e5f6a70006",
+    "status": {
+      "inhibitedBy": [],
+      "silencedBy": [],
+      "state": "active"
+    }
+  }
+]
