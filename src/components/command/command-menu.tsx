@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react"
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { useRouter } from "next/navigation"
-import { Bell, CircleSlash2, Settings2, SquareDot } from "lucide-react"
+import { Bell, CircleSlash2, PlusCircle, Settings2, SquareDot } from "lucide-react"
 import { useConfig } from "@/contexts/config"
+import { useSilenceDialog } from "@/contexts/silence-dialog"
 
 const navigation = [
   {
@@ -29,6 +30,7 @@ export function CommandMenu() {
   const router = useRouter()
   const { config } = useConfig()
   const { views, viewCategories } = config
+  const { openCreate } = useSilenceDialog()
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -47,6 +49,10 @@ export function CommandMenu() {
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Suggestions">
+          <CommandItem onSelect={() => { openCreate(); setOpen(false) }}>
+            <PlusCircle className="w-6 h-6 mr-2" />
+            New Silence
+          </CommandItem>
           {navigation.map((item) => (
             <CommandItem key={item.url} onSelect={() => { router.push(item.url); setOpen(false) }}>
               <item.icon className="w-6 h-6 mr-2" />

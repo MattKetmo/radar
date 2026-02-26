@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link"
-import { Bell, ChevronRight, CircleSlash2, MessageCircleQuestion, Settings2, SquareArrowOutUpRight, SquareDot } from "lucide-react"
+import { Bell, ChevronRight, CircleSlash2, MessageCircleQuestion, Plus, Settings2, SquareArrowOutUpRight, SquareDot } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -20,6 +20,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useConfig } from "@/contexts/config"
 import { useAlerts } from "@/contexts/alerts"
 import { alertFilter, flattenAlerts } from "@/components/alerts/utils"
+import { useSilenceDialog } from "@/contexts/silence-dialog"
 import { ViewConfig } from "@/config/types"
 import { usePathname } from "next/navigation"
 
@@ -47,6 +48,7 @@ export function AppSidebar() {
   const pathname = usePathname()
   const { setOpenMobile } = useSidebar();
   const { config } = useConfig()
+  const { openCreate } = useSilenceDialog()
   const { views, viewCategories } = config
   const { alerts } = useAlerts()
 
@@ -91,6 +93,12 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => { openCreate(); setOpenMobile(false) }}>
+                  <Plus />
+                  <span>New Silence</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <a target="_blank" href="https://github.com/MattKetmo/radar/issues">

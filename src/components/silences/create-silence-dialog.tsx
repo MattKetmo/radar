@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { LoaderCircle } from "lucide-react"
 import { toast } from "sonner"
+import { useHotkeys } from "react-hotkeys-hook"
 
 import { SilenceCreateSchema } from "@/types/alertmanager"
 import type { MatcherOperator } from "@/types/alertmanager"
@@ -36,7 +37,10 @@ const LOCAL_STORAGE_AUTHOR_KEY = "radar-silence-author"
 export function CreateSilenceDialog() {
   const { config } = useConfig()
   const { refreshSilences } = useSilences()
-  const { isOpen, mode, prefillData, prefillClusters, close } = useSilenceDialog()
+  const { isOpen, mode, prefillData, prefillClusters, openCreate, close } = useSilenceDialog()
+
+  useHotkeys('n', () => openCreate(), { preventDefault: true })
+
 
   const [selectedClusters, setSelectedClusters] = useState<string[]>([])
   const [matchers, setMatchers] = useState<MatcherRow[]>([
