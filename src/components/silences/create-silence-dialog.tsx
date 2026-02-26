@@ -86,7 +86,7 @@ export function CreateSilenceDialog() {
       setSelectedClusters(
         prefillClusters.length > 0
           ? prefillClusters
-          : config.clusters.map((c) => c.name)
+          : []
       )
       setMatchers([{ name: "", value: "", operator: "=" as MatcherOperator }])
       setStartsAt(now)
