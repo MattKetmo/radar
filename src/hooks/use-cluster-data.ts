@@ -14,6 +14,7 @@ export function useClusterData<T>(
   const [loading, setLoading] = useState(true)
   const [logoutDetected, setLogoutDetected] = useState(false)
   const [refreshInterval, setRefreshInterval] = useState(30)
+  const [fetchCount, setFetchCount] = useState(0)
   const failCount = useRef(0)
   const abortRef = useRef<AbortController | null>(null)
 
@@ -60,6 +61,7 @@ export function useClusterData<T>(
     setData(newData)
     setErrors(newErrors)
     setLoading(false)
+    setFetchCount((c) => c + 1)
   }, [config.clusters, endpoint, schema])
 
   const refresh = useCallback(async () => {
@@ -81,7 +83,7 @@ export function useClusterData<T>(
       fetchData()
     }, delay)
     return () => clearTimeout(timer)
-  }, [fetchData, refreshInterval])
+  }, [fetchData, refreshInterval, fetchCount])
 
   const value = useMemo(
     () => ({ data, errors, loading, logoutDetected, refreshInterval, setRefreshInterval, refresh }),
