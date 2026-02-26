@@ -81,7 +81,7 @@ export function useClusterData<T>(
       fetchData()
     }, delay)
     return () => clearTimeout(timer)
-  }, [fetchData, refreshInterval, data, errors])
+  }, [fetchData, refreshInterval])
 
   const value = useMemo(
     () => ({ data, errors, loading, logoutDetected, refreshInterval, setRefreshInterval, refresh }),
