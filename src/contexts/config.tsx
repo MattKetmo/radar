@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, ReactNode, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, ReactNode, useState, useEffect, useCallback, useMemo } from 'react'
 import { AlertCircle } from 'lucide-react'
 import { Config } from '@/config/types'
 import { Button } from '@/components/ui/button'
@@ -69,8 +69,10 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
     return <Loading />
   }
 
+  const value = useMemo(() => ({ config }), [config])
+
   return (
-    <ConfigContext.Provider value={{ config }}>
+    <ConfigContext.Provider value={value}>
       {children}
     </ConfigContext.Provider>
   )

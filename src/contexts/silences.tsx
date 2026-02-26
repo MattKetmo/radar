@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, useMemo, type ReactNode } from 'react';
 import { z } from 'zod';
 import { useConfig } from './config';
 import type { ClusterConfig } from '@/config/types';
@@ -95,7 +95,7 @@ export const SilencesProvider = ({ children }: { children: ReactNode }) => {
     refreshSilences();
   }, [refreshSilences]);
 
-  const value = {
+  const value = useMemo(() => ({
     silences,
     errors,
     loading,
@@ -103,7 +103,7 @@ export const SilencesProvider = ({ children }: { children: ReactNode }) => {
     refreshInterval,
     setRefreshInterval,
     refreshSilences,
-  };
+  }), [silences, errors, loading, logoutDetected, refreshInterval, refreshSilences])
 
   return (
     <SilencesContext.Provider value={value}>
