@@ -71,11 +71,15 @@ export const memoize = <T extends (...args: any[]) => Promise<any>>(fn: T) => {
 
 
 export const deepMerge = <T extends { [key: string]: any }>(target: T, source: T): T => {
+  const result = { ...target } as Record<string, any>;
   for (const key of Object.keys(source)) {
-    if (source[key] instanceof Object && key in target) {
-      Object.assign(source[key], deepMerge(target[key], source[key]))
+    if (source[key] !== undefined) {
+      if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key])) {
+        result[key] = deepMerge(result[key] as Record<string, unknown>, source[key] as Record<string, unknown>);
+      } else {
+        result[key] = source[key];
+      }
     }
   }
-  Object.assign(target || {}, source)
-  return target
-}
+  return result as T;
+};

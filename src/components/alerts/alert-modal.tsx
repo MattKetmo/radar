@@ -210,9 +210,17 @@ function AlertQuery(props: { alert: Alert }) {
   const query = useMemo(() => {
     if (!alert?.generatorURL) return null;
     try {
-      // TODO: generatorURL can be a simply path, not a full URL (eg Loki alerts /explore?left={\"queries\":...})
-      const url = new URL(alert.generatorURL);
-      const g0Expr = url.searchParams.get("g0.expr");
+      let parsedUrl: URL | null = null;
+      try {
+        parsedUrl = new URL(alert.generatorURL);
+      } catch {
+        try {
+          parsedUrl = new URL(alert.generatorURL, window.location.origin);
+        } catch {
+          parsedUrl = null;
+        }
+      }
+      const g0Expr = parsedUrl?.searchParams.get("g0.expr");
       return g0Expr ? decodeURIComponent(g0Expr) : null;
     } catch {
       return null;

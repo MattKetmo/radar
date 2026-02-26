@@ -128,66 +128,64 @@ function EditableFilterButton(props: {
 }) {
   const { filter, editFilter, deleteFilter } = props;
 
-  {
-    const [isEditing, setIsEditing] = useState(false);
-    const [editValue, setEditValue] = useState(
-      `${filter.label}${filterOperand(!filter.exclude, filter.regex)}${
-        filter.value
-      }`
-    );
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(
+    `${filter.label}${filterOperand(!filter.exclude, filter.regex)}${
+      filter.value
+    }`
+  );
 
-    const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-      const match = editValue.match(/^([^=!~]+)([=!~]+)(.+)$/);
-      if (match) {
-        const [, label, operator, value] = match;
-        const isExclude = operator.startsWith("!");
-        const isRegex = operator.includes("~");
+    const match = editValue.match(/^([^=!~]+)([=!~]+)(.+)$/);
+    if (match) {
+      const [, label, operator, value] = match;
+      const isExclude = operator.startsWith("!");
+      const isRegex = operator.includes("~");
 
-        const updatedFilter = {
-          label: label.trim(),
-          value: value.trim(),
-          exclude: isExclude,
-          regex: isRegex,
-        };
+      const updatedFilter = {
+        label: label.trim(),
+        value: value.trim(),
+        exclude: isExclude,
+        regex: isRegex,
+      };
 
-        editFilter(updatedFilter);
-        setIsEditing(false);
-      }
-    };
+      editFilter(updatedFilter);
+      setIsEditing(false);
+    }
+  };
 
-    return (
-      <div
-        className="flex items-center px-2 py-0.5 bg-secondary rounded-sm shadow-xs border-border/20"
-      >
-        {isEditing ? (
-          <form onSubmit={handleSubmit} className="flex">
-            <input
-              autoFocus
-              className="bg-transparent outline-hidden w-full min-w-[150px]"
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={(e) => handleSubmit(e)}
-            />
-          </form>
-        ) : (
-          <button onClick={() => setIsEditing(true)}>
-            <span className="font-semibold font-mono">{filter.label}</span>
-            <span className="text-muted-foreground">
-              {filterOperand(!filter.exclude, filter.regex)}
-            </span>
-            <span className="truncate">{filter.value}</span>
-          </button>
-        )}
-        <button
-          className="ml-1"
-          title="Remove filter"
-          onClick={deleteFilter}
-        >
-          <XIcon size={14} className="text-muted-foreground" />
+  return (
+    <div
+      className="flex items-center px-2 py-0.5 bg-secondary rounded-sm shadow-xs border-border/20"
+    >
+      {isEditing ? (
+        <form onSubmit={handleSubmit} className="flex">
+          <input
+            autoFocus
+            className="bg-transparent outline-hidden w-full min-w-[150px]"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={(e) => handleSubmit(e)}
+          />
+        </form>
+      ) : (
+        <button onClick={() => setIsEditing(true)}>
+          <span className="font-semibold font-mono">{filter.label}</span>
+          <span className="text-muted-foreground">
+            {filterOperand(!filter.exclude, filter.regex)}
+          </span>
+          <span className="truncate">{filter.value}</span>
         </button>
-      </div>
-    );
-  }
+      )}
+      <button
+        className="ml-1"
+        title="Remove filter"
+        onClick={deleteFilter}
+      >
+        <XIcon size={14} className="text-muted-foreground" />
+      </button>
+    </div>
+  );
 }
