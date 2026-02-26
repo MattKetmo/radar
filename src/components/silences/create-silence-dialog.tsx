@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useState } from "react"
-import { LoaderCircle } from "lucide-react"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { ChevronRight, LoaderCircle } from "lucide-react"
 import { toast } from "sonner"
 import { useHotkeys } from "react-hotkeys-hook"
 
@@ -24,6 +24,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { AlertSeverity } from "@/components/alerts/alert-severity"
+import { formatDate } from "@/lib/date"
+import { cn } from "@/lib/utils"
 import { operatorToMatcher } from "./matcher-utils"
 import { MatcherBuilder } from "./matcher-builder"
 import { DurationPicker } from "./duration-picker"
@@ -58,8 +60,34 @@ export function CreateSilenceDialog() {
   const [comment, setComment] = useState("")
   const [silenceId, setSilenceId] = useState<string | undefined>(undefined)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showPreview, setShowPreview] = useState(false)
-  const [previewResults, setPreviewResults] = useState<Array<{ cluster: string; alerts: Alert[] }>>([])
+  const [previewExpanded, setPreviewExpanded] = useState(false)
+
+  const previewResults = useMemo(() => {
+    const validMatchers = matchers.filter((m) => m.name.trim() !== "")
+    if (selectedClusters.length === 0 || validMatchers.length === 0) return []
+    const mockSilence: Silence = {
+      id: "",
+      matchers: validMatchers.map((m) => ({
+        name: m.name,
+        value: m.value,
+        ...operatorToMatcher(m.operator),
+      })),
+      startsAt: "",
+      endsAt: "",
+      createdBy: "",
+      comment: "",
+      status: { state: "pending" as const },
+    }
+    return selectedClusters.map((cluster) => ({
+      cluster,
+      alerts: matchAlerts(
+        mockSilence,
+        cachedAlerts[cluster] || []
+      ).sort((a, b) => b.startsAt.localeCompare(a.startsAt)),
+    }))
+  }, [selectedClusters, matchers, cachedAlerts])
+
+  const totalMatched = previewResults.reduce((sum, r) => sum + r.alerts.length, 0)
 
   // Initialize form state when dialog opens
   useEffect(() => {
@@ -114,38 +142,6 @@ export function CreateSilenceDialog() {
         : [...prev, clusterName]
     )
   }, [])
-
-  const handlePreview = useCallback(() => {
-    const validMatchers = matchers.filter((m) => m.name.trim() !== "")
-
-    if (selectedClusters.length === 0 || validMatchers.length === 0) {
-      setPreviewResults([])
-      setShowPreview(true)
-      return
-    }
-
-    const mockSilence: Silence = {
-      id: "",
-      matchers: validMatchers.map((m) => ({
-        name: m.name,
-        value: m.value,
-        ...operatorToMatcher(m.operator),
-      })),
-      startsAt: "",
-      endsAt: "",
-      createdBy: "",
-      comment: "",
-      status: { state: "pending" },
-    }
-
-    const results = selectedClusters.map((cluster) => ({
-      cluster,
-      alerts: matchAlerts(mockSilence, cachedAlerts[cluster] || []),
-    }))
-
-    setPreviewResults(results)
-    setShowPreview(true)
-  }, [selectedClusters, matchers, cachedAlerts])
 
   const handleSubmit = useCallback(async () => {
     // Validate: at least one cluster
@@ -262,8 +258,8 @@ export function CreateSilenceDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && close()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+        <DialogHeader className="shrink-0">
           <DialogTitle>
             {mode === "edit" ? "Edit Silence" : "Create Silence"}
           </DialogTitle>
@@ -274,13 +270,13 @@ export function CreateSilenceDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-2">
+        <div className="space-y-6 py-2 overflow-y-auto flex-1">
           {/* Clusters */}
           <fieldset className="space-y-3">
             <Label asChild>
               <legend>Clusters</legend>
             </Label>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col gap-2">
               {config.clusters.map((cluster) => (
                 <label
                   key={cluster.name}
@@ -320,72 +316,6 @@ export function CreateSilenceDialog() {
             />
           </fieldset>
 
-          {/* Preview */}
-          <div className="space-y-3">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handlePreview}
-            >
-              Preview matching alerts
-            </Button>
-            {showPreview && (
-              <div className="space-y-2 rounded-md border p-3 text-sm">
-                {selectedClusters.length === 0 ? (
-                  <p className="text-muted-foreground">
-                    Select at least one cluster to preview
-                  </p>
-                ) : matchers.every((m) => !m.name.trim()) ? (
-                  <p className="text-muted-foreground">
-                    Add at least one matcher to preview
-                  </p>
-                ) : previewResults.every((r) => r.alerts.length === 0) ? (
-                  <p className="text-muted-foreground">No alerts matched</p>
-                ) : (
-                  <>
-                    {(() => {
-                      const total = previewResults.reduce(
-                        (s, r) => s + r.alerts.length,
-                        0
-                      )
-                      const clusters = previewResults.filter(
-                        (r) => r.alerts.length > 0
-                      ).length
-                      return (
-                        <p className="font-medium">
-                          {total} {total === 1 ? "alert" : "alerts"} matched
-                          {" "}across {clusters}{" "}
-                          {clusters === 1 ? "cluster" : "clusters"}
-                        </p>
-                      )
-                    })()}
-                    {previewResults
-                      .filter((r) => r.alerts.length > 0)
-                      .map((r) => (
-                        <div key={r.cluster} className="space-y-1">
-                          <p className="font-medium text-xs text-muted-foreground">
-                            {r.cluster}
-                          </p>
-                          <div className="space-y-1">
-                            {r.alerts.map((alert) => (
-                              <div
-                                key={alert.fingerprint}
-                                className="flex items-center gap-2"
-                              >
-                                <AlertSeverity alert={alert} />
-                                <span>{alert.labels.alertname}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-
           {/* Author */}
           <div className="space-y-2">
             <Label htmlFor="silence-author">Author</Label>
@@ -409,9 +339,60 @@ export function CreateSilenceDialog() {
               rows={3}
             />
           </div>
+
+          {/* Alert Preview */}
+          {totalMatched > 0 && (
+            <div className="space-y-2">
+              <button
+                type="button"
+                className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setPreviewExpanded(!previewExpanded)}
+              >
+                <ChevronRight
+                  className={cn(
+                    "h-4 w-4 transition-transform",
+                    previewExpanded && "rotate-90"
+                  )}
+                />
+                Matching alerts ({totalMatched})
+              </button>
+              {previewExpanded && (
+                <div className="space-y-3 max-h-[200px] overflow-y-auto">
+                  {previewResults.map((result) => (
+                    <div key={result.cluster}>
+                      {previewResults.length > 1 && (
+                        <div className="text-xs font-medium text-muted-foreground mb-1">
+                          {result.cluster}
+                        </div>
+                      )}
+                      <div className="space-y-1">
+                        {result.alerts.map((alert) => (
+                          <div
+                            key={`${alert.labels?.alertname}-${alert.fingerprint}`}
+                            className="flex items-center gap-2 bg-secondary px-3 py-2 rounded-md text-sm"
+                          >
+                            <AlertSeverity alert={alert} />
+                            <div className="truncate">{alert.labels?.alertname}</div>
+                            <div className="grow" />
+                            <time
+                              className="w-[65px] text-right text-xs shrink-0 text-nowrap text-muted-foreground"
+                              dateTime={new Date(alert.startsAt).toISOString()}
+                              title={new Date(alert.startsAt).toISOString()}
+                            >
+                              {formatDate(new Date(alert.startsAt), "en")}
+                            </time>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="shrink-0 border-t pt-4">
           <Button
             type="button"
             variant="outline"
