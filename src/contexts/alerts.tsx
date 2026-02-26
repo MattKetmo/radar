@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, ReactNode, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, ReactNode, useState, useEffect, useCallback, useMemo } from 'react'
 import { Alert, AlertSchema } from '@/types/alertmanager'
 import { ClusterConfig } from '@/config/types'
 import { useConfig } from '@/contexts/config'
@@ -49,18 +49,20 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // Add extra labels to each alert
-      parsedData.data.forEach(alert => {
-        alert.labels = {
+      // Add extra labels to each alert (immutable transform)
+      const enrichedAlerts = parsedData.data.map(alert => ({
+        ...alert,
+        labels: {
           '@cluster': cluster.name,
           ...alert.labels,
           ...cluster.labels,
-        }
-      })
+        },
+      }))
 
       // Update alerts for this cluster
       setAlerts(prev => ({
         ...prev,
-        [cluster.name]: parsedData.data
+        [cluster.name]: enrichedAlerts
       }))
 
       // Clear any previous errors
@@ -104,7 +106,7 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
     refreshAlerts()
   }, [refreshAlerts])
 
-  const value = {
+  const value = useMemo(() => ({
     alerts,
     errors,
     loading,
@@ -112,7 +114,7 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
     refreshInterval,
     setRefreshInterval,
     refreshAlerts,
-  }
+  }), [alerts, errors, loading, logoutDetected, refreshInterval, refreshAlerts])
 
   return (
     <AlertsContext.Provider value={value}>

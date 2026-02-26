@@ -1,4 +1,5 @@
 import { Alert } from "@/types/alertmanager"
+import { safeRegExp } from "@/lib/regexp"
 import { LabelFilter } from "./types"
 import { createParser } from "nuqs"
 
@@ -61,7 +62,10 @@ export function alertFilter(filters: LabelFilter[], matchAll = true): (alert: Al
         return true
       }
       if (filter.regex) {
-        const regex = new RegExp(Array.isArray(filter.value) ? filter.value.join('|') : filter.value)
+        const regex = safeRegExp(Array.isArray(filter.value) ? filter.value.join('|') : filter.value)
+        if (!regex) {
+          return filter.exclude
+        }
         if (filter.exclude) {
           return !regex.test(value)
         }
