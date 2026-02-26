@@ -90,6 +90,7 @@ function AddFilterButton(props: {
           value={filterText}
           onChange={(e) => setFilterText(e.target.value)}
           placeholder="label=value"
+          aria-label="Add filter"
           className="px-2 py-1 text-sm border rounded-sm focus:outline-hidden focus:ring-1 focus:ring-primary"
           autoFocus
           onBlur={() => setIsEditing(false)}
@@ -164,6 +165,7 @@ function EditableFilterButton(props: {
         <form onSubmit={handleSubmit} className="flex">
           <input
             autoFocus
+            aria-label="Edit filter"
             className="bg-transparent outline-hidden w-full min-w-[150px]"
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
@@ -182,6 +184,7 @@ function EditableFilterButton(props: {
       <button
         className="ml-1"
         title="Remove filter"
+        aria-label="Delete filter"
         onClick={deleteFilter}
       >
         <XIcon size={14} className="text-muted-foreground" />

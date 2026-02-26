@@ -151,8 +151,10 @@ export function AlertsTemplate(props: Props) {
           <div className="font-medium">Alerts</div>
           <div className="text-muted-foreground">/</div>
           <div className="truncate">{view.name ? view.name : viewName}</div>
-          <div className="hidden sm:inline-flex ml-2 h-8 items-center justify-center rounded-md bg-accent p-1 text-accent-foreground">
+          <div className="hidden sm:inline-flex ml-2 h-8 items-center justify-center rounded-md bg-accent p-1 text-accent-foreground" role="tablist">
             <button
+              role="tab"
+              aria-selected={alertState === 'active'}
               data-state={alertState === "inactive" ? "" : "active"}
               onClick={() => {
                 setAlertState("active");
@@ -162,6 +164,8 @@ export function AlertsTemplate(props: Props) {
               Active
             </button>
             <button
+              role="tab"
+              aria-selected={alertState === 'inactive'}
               data-state={alertState === "inactive" ? "active" : ""}
               onClick={() => {
                 setAlertState("inactive");
