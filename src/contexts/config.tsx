@@ -44,6 +44,8 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [])
 
+  const value = useMemo(() => ({ config: config! }), [config])
+
   useEffect(() => {
     fetchConfig()
   }, [fetchConfig, retryCount])
@@ -68,8 +70,6 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
   if (config === null) {
     return <Loading />
   }
-
-  const value = useMemo(() => ({ config }), [config])
 
   return (
     <ConfigContext.Provider value={value}>
