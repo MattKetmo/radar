@@ -9,6 +9,7 @@ import { AlertsProvider } from "@/contexts/alerts";
 import { SilencesProvider } from "@/contexts/silences";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LogoutDetectedDialog } from "@/components/layout/logout-detected-dialog";
+import { Toaster } from "@/components/ui/sonner";
 
 
 const geistSans = localFont({
@@ -63,6 +64,7 @@ export default async function RootLayout({
                       {children}
                     </AppLayout>
                     <LogoutDetectedDialog />
+                    <Toaster />
                   </SilencesProvider>
                 </AlertsProvider>
               </ConfigProvider>
