@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { notFound } from "next/navigation";
 import { parseAsArrayOf, useQueryState } from "nuqs";
 import {
@@ -54,9 +54,7 @@ export function AlertsTemplate(props: Props) {
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [selectedAlertId] = useQueryState("alert", { defaultValue: "" });
   const [group] = useQueryState("group", { defaultValue: "" });
-  const [flattenedAlerts, setFlattenedAlerts] = useState<Alert[]>([]);
   const [view, setView] = useState<ViewConfig | null>(null);
-  const [alertGroups, setAlertGroups] = useState<Group[]>([]);
   const [filters, setFilters] = useQueryState(
     "filters",
     parseAsArrayOf(parseAsFilter, ";")
@@ -71,16 +69,14 @@ export function AlertsTemplate(props: Props) {
   // Load view config
   useEffect(() => setView(config.views[viewName]), [viewName, config]);
 
-  // Filter & group matching alerts
-  useEffect(() => {
+  // Filter & sort matching alerts
+  const flattenedAlerts = useMemo(() => {
     if (!view) {
-      return;
+      return [];
     }
 
-    const groupBy = group !== "" ? group : view.groupBy;
     const filterActive = alertState !== "inactive";
 
-    // Flatten, filter & sort alerts
     const flatAlerts = Object.values(alerts)
       .reduce((acc, val) => acc.concat(val), [])
       .filter(alertFilter(view.filters, view.filtersMatch === "all"))
@@ -92,11 +88,19 @@ export function AlertsTemplate(props: Props) {
       );
     flatAlerts.sort(alertSort);
 
-    setFlattenedAlerts(flatAlerts);
+    return flatAlerts;
+  }, [alerts, view, filters, filterMatch, alertState]);
 
-    // Group alerts by specified field
-    const alertGroups: Group[] = Object.entries(
-      flatAlerts.reduce((acc: Record<string, Alert[]>, alert: Alert) => {
+  // Group alerts by specified field
+  const alertGroups = useMemo(() => {
+    if (!view) {
+      return [];
+    }
+
+    const groupBy = group !== "" ? group : view.groupBy;
+
+    const groups: Group[] = Object.entries(
+      flattenedAlerts.reduce((acc: Record<string, Alert[]>, alert: Alert) => {
         const cluster = alert.labels[groupBy];
         if (!acc[cluster]) {
           acc[cluster] = [];
@@ -105,11 +109,12 @@ export function AlertsTemplate(props: Props) {
         return acc;
       }, {})
     ).map(([name, alerts]) => ({ name, alerts }));
-    alertGroups.sort((a, b) => {
+    groups.sort((a, b) => {
       return a.name.localeCompare(b.name);
     });
-    setAlertGroups(alertGroups);
-  }, [view, alerts, group, filters, filterMatch, alertState]);
+
+    return groups;
+  }, [flattenedAlerts, view, group]);
 
   // Select alert by ID (fingerprint)
   useEffect(() => {
@@ -130,9 +135,12 @@ export function AlertsTemplate(props: Props) {
     return notFound();
   }
 
-  const labels = Array.from(
-    new Set(flattenedAlerts.flatMap((alert) => Object.keys(alert.labels)))
-  ).sort();
+  const labels = useMemo(
+    () => Array.from(
+      new Set(flattenedAlerts.flatMap((alert) => Object.keys(alert.labels)))
+    ).sort(),
+    [flattenedAlerts]
+  );
 
   if (!view) return null;
 
