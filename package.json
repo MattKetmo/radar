@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
@@ -43,13 +46,20 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.1",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
     "@types/node": "^25.3.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5",
     "eslint": "^10.0.2",
     "eslint-config-next": "16.1.6",
+    "jsdom": "^26",
+    "msw": "^2",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.2.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^5",
+    "vitest": "^3"
   }
 }
