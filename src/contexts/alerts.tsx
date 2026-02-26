@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, ReactNode, useState, useEffect, useCallback, useMemo } from 'react'
+import React, { createContext, useContext, ReactNode, useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Alert, AlertSchema } from '@/types/alertmanager'
 import { ClusterConfig } from '@/config/types'
 import { useConfig } from '@/contexts/config'
@@ -27,11 +27,13 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
   const [alerts, setAlerts] = useState<Record<string, Alert[]>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [refreshInterval, setRefreshInterval] = useState<number>(30)
+  const failCount = useRef(0)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
-  const fetchAlertsForCluster = async (cluster: ClusterConfig) => {
+  const fetchAlertsForCluster = async (cluster: ClusterConfig, signal: AbortSignal): Promise<boolean> => {
     try {
       // Fetch alerts for this cluster
-      const response = await fetch(`/api/clusters/${cluster.name}/alerts`, { redirect: 'manual' })
+      const response = await fetch(`/api/clusters/${cluster.name}/alerts`, { redirect: 'manual', signal })
       if (response.type === 'opaqueredirect') {
         setLogoutDetected(true)
         throw new Error(`redirection not allowed`)
@@ -48,7 +50,6 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
         throw new Error(`invalid alert format`)
       }
 
-      // Add extra labels to each alert
       // Add extra labels to each alert (immutable transform)
       const enrichedAlerts = parsedData.data.map(alert => ({
         ...alert,
@@ -70,7 +71,11 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
         const { [cluster.name]: _, ...rest } = prev
         return rest
       })
+
+      return true
     } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') return true
+
       let message = 'Unknown Error'
       if (error instanceof Error) message = error.message
 
@@ -79,26 +84,55 @@ export const AlertsProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         [cluster.name]: message
       }))
+
+      return false
     }
   }
 
   // Fetch alerts for all clusters
   const refreshAlerts = useCallback(async () => {
     if (clusters.length === 0) return
+
+    abortControllerRef.current?.abort()
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
     setLoading(true)
-    await Promise.all(clusters.map(cluster => fetchAlertsForCluster(cluster)))
+    const results = await Promise.all(clusters.map(cluster => fetchAlertsForCluster(cluster, controller.signal)))
     setLoading(false)
+
+    if (controller.signal.aborted) return
+
+    if (results.every(Boolean)) {
+      failCount.current = 0
+    } else {
+      failCount.current++
+    }
   }, [clusters])
 
   // Refresh alerts on an interval
   useEffect(() => {
     if (refreshInterval === 0) return
 
-    const intervalId = setInterval(() => {
-      refreshAlerts()
-    }, refreshInterval * 1000)
+    let timeoutId: ReturnType<typeof setTimeout>
+    let cancelled = false
 
-    return () => clearInterval(intervalId)
+    const schedule = () => {
+      const delay = Math.min(refreshInterval * 1000 * Math.pow(2, failCount.current), 300000)
+      timeoutId = setTimeout(async () => {
+        if (cancelled) return
+        await refreshAlerts()
+        if (!cancelled) schedule()
+      }, delay)
+    }
+
+    schedule()
+
+    return () => {
+      cancelled = true
+      clearTimeout(timeoutId)
+      abortControllerRef.current?.abort()
+    }
   }, [refreshInterval, refreshAlerts])
 
   // Fetch alerts on initial load

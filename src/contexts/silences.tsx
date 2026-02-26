@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useState, useMemo, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useMemo, type ReactNode } from 'react';
 import { z } from 'zod';
 import { useConfig } from './config';
 import type { ClusterConfig } from '@/config/types';
@@ -35,10 +35,12 @@ export const SilencesProvider = ({ children }: { children: ReactNode }) => {
   const [silences, setSilences] = useState<Record<string, Silence[]>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [refreshInterval, setRefreshInterval] = useState<number>(60);
+  const failCount = useRef(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  const fetchSilencesForCluster = async (cluster: ClusterConfig) => {
+  const fetchSilencesForCluster = async (cluster: ClusterConfig, signal: AbortSignal): Promise<boolean> => {
     try {
-      const response = await fetch(`/api/clusters/${cluster.name}/silences`, { redirect: 'manual' });
+      const response = await fetch(`/api/clusters/${cluster.name}/silences`, { redirect: 'manual', signal });
       if (response.type === 'opaqueredirect') {
         setLogoutDetected(true);
         throw new Error(`redirection not allowed`);
@@ -63,7 +65,11 @@ export const SilencesProvider = ({ children }: { children: ReactNode }) => {
         const { [cluster.name]: _, ...rest } = prev;
         return rest;
       });
+
+      return true;
     } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') return true;
+
       let message = 'Unknown Error';
       if (error instanceof Error) message = error.message;
 
@@ -71,24 +77,53 @@ export const SilencesProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         [cluster.name]: message
       }));
+
+      return false;
     }
   };
 
   const refreshSilences = useCallback(async () => {
     if (clusters.length === 0) return;
+
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
-    await Promise.all(clusters.map(cluster => fetchSilencesForCluster(cluster)));
+    const results = await Promise.all(clusters.map(cluster => fetchSilencesForCluster(cluster, controller.signal)));
     setLoading(false);
+
+    if (controller.signal.aborted) return;
+
+    if (results.every(Boolean)) {
+      failCount.current = 0;
+    } else {
+      failCount.current++;
+    }
   }, [clusters]);
 
   useEffect(() => {
     if (refreshInterval === 0) return;
 
-    const intervalId = setInterval(() => {
-      refreshSilences();
-    }, refreshInterval * 1000);
+    let timeoutId: ReturnType<typeof setTimeout>;
+    let cancelled = false;
 
-    return () => clearInterval(intervalId);
+    const schedule = () => {
+      const delay = Math.min(refreshInterval * 1000 * Math.pow(2, failCount.current), 300000);
+      timeoutId = setTimeout(async () => {
+        if (cancelled) return;
+        await refreshSilences();
+        if (!cancelled) schedule();
+      }, delay);
+    };
+
+    schedule();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+      abortControllerRef.current?.abort();
+    };
   }, [refreshInterval, refreshSilences]);
 
   useEffect(() => {
