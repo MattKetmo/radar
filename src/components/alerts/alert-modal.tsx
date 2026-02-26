@@ -16,14 +16,6 @@ import {
   SquareArrowOutUpRight,
   ZoomInIcon,
 } from "lucide-react";
-  Check,
-  CheckIcon,
-  ClipboardCopy,
-  SearchIcon,
-  Square,
-  SquareArrowOutUpRight,
-  ZoomInIcon,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlertSeverity } from "./alert-severity";
 import { parseAsArrayOf, useQueryState } from "nuqs";
@@ -34,7 +26,7 @@ function isURL(string: string): boolean {
   try {
     new URL(string);
     return true;
-  } catch (_) {
+  } catch (_error) {
     return false;
   }
 }
@@ -45,8 +37,8 @@ type Props = {
 
 export function AlertModal(props: Props) {
   const { alert } = props;
-  const { alert } = props;
-  const { summary: _summary } = alert?.annotations || {};
+
+  const { summary: _summary, description: _description } = alert?.annotations || {};
   const [selectedAlertId, setSelectedAlertId] = useQueryState("alert", {
     defaultValue: "",
   });

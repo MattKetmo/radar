@@ -11,7 +11,7 @@ export async function resolveConfigFile(filenames: string[], directory: string):
       if (stat.isFile()) {
         return filepath
       }
-    } catch (error) { }
+    } catch (_error) { }
   }
   throw new Error('No config file found')
 }
@@ -36,7 +36,7 @@ export async function parseConfigFile(filepath: string): Promise<Config> {
   return parsedConfig
 }
 
-/* eslint @typescript-eslint/no-explicit-any: 0 */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic object traversal requires any type
 export function resolveEnvVars(obj: any): any {
   if (typeof obj === 'string') {
     return obj.replace(/\${([^}]+)}/g, (match, key) => {
@@ -55,7 +55,7 @@ export function resolveEnvVars(obj: any): any {
   }
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic function type requires any for args
 export const memoize = <T extends (...args: any[]) => Promise<any>>(fn: T) => {
   const cache = new Map<string, ReturnType<T>>()
   return async function (...args: Parameters<T>): Promise<ReturnType<T>> {
@@ -69,7 +69,7 @@ export const memoize = <T extends (...args: any[]) => Promise<any>>(fn: T) => {
   }
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic object merge requires any for flexible typing
 export const deepMerge = <T extends { [key: string]: any }>(target: T, source: T): T => {
   for (const key of Object.keys(source)) {
     if (source[key] instanceof Object && key in target) {

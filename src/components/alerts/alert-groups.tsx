@@ -3,6 +3,9 @@ import { ChevronDown } from "lucide-react"
 
 import {
   Collapsible,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+  Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
