@@ -14,8 +14,6 @@ export function useClusterData<T>(
   const [loading, setLoading] = useState(true)
   const [logoutDetected, setLogoutDetected] = useState(false)
   const [refreshInterval, setRefreshInterval] = useState(30)
-  const [fetchCount, setFetchCount] = useState(0)
-  const failCount = useRef(0)
   const abortRef = useRef<AbortController | null>(null)
 
   const fetchData = useCallback(async () => {
@@ -25,7 +23,6 @@ export function useClusterData<T>(
 
     const newData: Record<string, T[]> = {}
     const newErrors: Record<string, string> = {}
-    let anyFailure = false
 
     await Promise.all(
       config.clusters.map(async (cluster) => {
@@ -44,7 +41,6 @@ export function useClusterData<T>(
           newData[cluster.name] = parsed.data
         } catch (err) {
           if (err instanceof Error && err.name === 'AbortError') return
-          anyFailure = true
           newErrors[cluster.name] = err instanceof Error ? err.message : String(err)
         }
       })
@@ -52,16 +48,9 @@ export function useClusterData<T>(
 
     if (controller.signal.aborted) return
 
-    if (anyFailure) {
-      failCount.current++
-    } else {
-      failCount.current = 0
-    }
-
     setData(newData)
     setErrors(newErrors)
     setLoading(false)
-    setFetchCount((c) => c + 1)
   }, [config.clusters, endpoint, schema])
 
   const refresh = useCallback(async () => {
@@ -69,6 +58,7 @@ export function useClusterData<T>(
     await fetchData()
   }, [fetchData])
 
+  // Initial fetch on mount
   useEffect(() => {
     fetchData()
     return () => {
@@ -76,14 +66,14 @@ export function useClusterData<T>(
     }
   }, [fetchData])
 
+  // Polling: re-fetch every refreshInterval seconds
   useEffect(() => {
     if (refreshInterval === 0) return
-    const delay = Math.min(refreshInterval * 1000 * Math.pow(2, failCount.current), 300000)
-    const timer = setTimeout(() => {
+    const id = setInterval(() => {
       fetchData()
-    }, delay)
-    return () => clearTimeout(timer)
-  }, [fetchData, refreshInterval, fetchCount])
+    }, refreshInterval * 1000)
+    return () => clearInterval(id)
+  }, [fetchData, refreshInterval])
 
   const value = useMemo(
     () => ({ data, errors, loading, logoutDetected, refreshInterval, setRefreshInterval, refresh }),
