@@ -1,9 +1,5 @@
-import { LoaderCircle, RefreshCcw, TriangleAlert } from 'lucide-react';
 import AppHeader from '@/components/layout/app-header';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-
+import { RefreshControls } from '@/components/layout/refresh-controls';
 
 type Props = {
   errors: Record<string, string>;
@@ -22,67 +18,13 @@ export function Header(props: Props) {
         <div className="font-medium">
           Silences
         </div>
-        <div>
-          {
-            !loading && Object.entries(errors).length > 0 && (
-              <TooltipProvider delayDuration={150}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TriangleAlert
-                      size={16}
-                      className='text-orange-500'
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <ul>
-                      {Object.entries(errors).map(([cluster, message]) => (
-                        <li key={cluster}>
-                          <span className='font-semibold'>{cluster}</span>: {message}
-                        </li>
-                      ))}
-                    </ul>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )
-          }
-        </div>
-
-        <div className='grow' />
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              disabled={loading}
-              onClick={() => refreshSilences()}
-              className={loading ? 'cursor-not-allowed text-muted-foreground ' : ''}
-            >
-              {loading && (
-                <LoaderCircle size={16} className='animate-[spin_1s]' />
-              ) || (
-                  <RefreshCcw size={16} />
-                )}
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="left" className="flex items-center gap-2">
-            <span>Refresh</span>
-            <span className="font-mono flex items-center justify-center h-5 w-5 text-muted-foreground border-muted-foreground border rounded-sm">R</span>
-          </TooltipContent>
-        </Tooltip>
-
-        <div>
-          <Select value={`${refreshInterval}`} onValueChange={(value) => setRefreshInterval(Number(value))}>
-            <SelectTrigger className="w-[80px] h-[30px]">
-              <SelectValue placeholder="Refresh" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="0">Off</SelectItem>
-              <SelectItem value="10">10s</SelectItem>
-              <SelectItem value="30">30s</SelectItem>
-              <SelectItem value="60">60s</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <RefreshControls
+          loading={loading}
+          errors={errors}
+          refreshInterval={refreshInterval}
+          onRefresh={refreshSilences}
+          onRefreshIntervalChange={setRefreshInterval}
+        />
       </div>
     </AppHeader>
   );

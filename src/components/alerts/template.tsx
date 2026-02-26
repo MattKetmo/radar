@@ -3,33 +3,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { notFound } from "next/navigation";
 import { parseAsArrayOf, useQueryState } from "nuqs";
-import {
-  LoaderCircle,
-  RefreshCcw,
-  TriangleAlert,
-} from "lucide-react";
 import { ViewConfig } from "@/config/types";
 import { useAlerts } from "@/contexts/alerts";
 import { useConfig } from "@/contexts/config";
 import AppHeader from "@/components/layout/app-header";
+import { RefreshControls } from "@/components/layout/refresh-controls";
+import { ListFooter } from "@/components/layout/list-footer";
 import { Alert } from "@/types/alertmanager";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { AlertGroups, AlertGroupsSkeleton } from "./alert-groups";
 import { AlertModal } from "./alert-modal";
 import { Group } from "./types";
 import { alertFilter, alertSort, parseAsFilter } from "./utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import GroupSelect from "./group-select";
 import { useHotkeys } from "react-hotkeys-hook";
 import { AlertFilters } from "./alert-filters";
@@ -175,68 +159,13 @@ export function AlertsTemplate(props: Props) {
               Inactive
             </button>
           </div>
-          <div>
-            {!loading && Object.entries(errors).length > 0 && (
-              <TooltipProvider delayDuration={150}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TriangleAlert size={16} className="text-orange-500" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <ul>
-                      {Object.entries(errors).map(([cluster, message]) => (
-                        <li key={cluster}>
-                          <span className="font-semibold">{cluster}</span>:{" "}
-                          {message}
-                        </li>
-                      ))}
-                    </ul>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </div>
-
-          <div className="grow" />
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                disabled={loading}
-                onClick={() => refreshAlerts()}
-                className={
-                  loading ? "cursor-not-allowed text-muted-foreground " : ""
-                }
-              >
-                {(loading && (
-                  <LoaderCircle size={16} className="animate-[spin_1s]" />
-                )) || <RefreshCcw size={16} />}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="left" className="flex items-center gap-2">
-              <span>Refresh</span>
-              <span className="font-mono flex items-center justify-center h-5 w-5 text-muted-foreground border-muted-foreground border rounded-sm">
-                R
-              </span>
-            </TooltipContent>
-          </Tooltip>
-
-          <div>
-            <Select
-              value={`${refreshInterval}`}
-              onValueChange={(value) => setRefreshInterval(Number(value))}
-            >
-              <SelectTrigger className="w-[80px] h-[30px]">
-                <SelectValue placeholder="Refresh" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">Off</SelectItem>
-                <SelectItem value="10">10s</SelectItem>
-                <SelectItem value="30">30s</SelectItem>
-                <SelectItem value="60">60s</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <RefreshControls
+            loading={loading}
+            errors={errors}
+            refreshInterval={refreshInterval}
+            onRefresh={refreshAlerts}
+            onRefreshIntervalChange={setRefreshInterval}
+          />
         </div>
       </AppHeader>
 
@@ -253,26 +182,12 @@ export function AlertsTemplate(props: Props) {
           <AlertGroups alertGroups={alertGroups} />
         )}
 
-        <footer className="my-6 text-xs flex gap-2 justify-center text-muted-foreground">
-          {loading || (
-            <>
-              <span>
-                Total of{" "}
-                <span className="font-semibold">
-                  {flattenedAlerts.length} alerts
-                </span>{" "}
-                displayed.
-              </span>
-              <button
-                disabled={loading}
-                onClick={() => refreshAlerts()}
-                className="font-semibold hover:underline underline-offset-2"
-              >
-                Refresh
-              </button>
-            </>
-          )}
-        </footer>
+        <ListFooter
+          count={flattenedAlerts.length}
+          loading={loading}
+          onRefresh={refreshAlerts}
+          label="alerts"
+        />
       </div>
 
       <AlertModal alert={selectedAlert} />
