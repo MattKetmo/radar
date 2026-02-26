@@ -1,11 +1,11 @@
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+
 import { Alert } from "@/types/alertmanager"
 import { formatDate } from "@/lib/date"
-import { stringToColor } from "./utils"
+
 import { AlertSeverity } from "./alert-severity"
-import { BellOff, MegaphoneOff } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { BellOff } from "lucide-react"
+
 
 const importantLabels = [
   'host',
@@ -102,20 +102,14 @@ function AlertLabels({ alert }: { alert: Alert }) {
 
   return (
     <div className="shrink truncate relative -mr-[0.2rem] hidden sm:block sm:max-w-[45%] md:max-w-auto">
-      {/* {labels.length > 2 && (
-        <div className="absolute top-0 right-0 bottom-0 w-[30px] bg-linear-to-r from-transparent to-background" />
-      )} */}
       <ul className="flex items-center gap-1">
         {labels.map(({ key, value }) => (
           <li key={key}>
             <button
               title={`${key}: ${value}`}
               className="text-xs bg-secondary px-2 py-1 items-center rounded-sm gap-1 flex hover:border-primary"
-            // className="text-xs border px-2  items-center rounded-full gap-2 flex hover:border-primary"
             >
-              {/* {key === 'namespace' && (
-                <span className="h-2 w-2 block rounded-full" style={{backgroundColor: stringToColor(value)}}/>
-              )} */}
+
               <div className="shrink-0 truncate text-primary max-w-[230px]">
                 <span className="font-medium">
                   {key}{': '}
@@ -127,11 +121,6 @@ function AlertLabels({ alert }: { alert: Alert }) {
             </button>
           </li>
         ))}
-        {/* <li>
-          <span className="text-xs border px-2 py-1 rounded-full flex gap-1 hover:border-primary">
-            +1
-          </span>
-        </li> */}
       </ul>
     </div>
   )

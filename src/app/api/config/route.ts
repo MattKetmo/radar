@@ -1,5 +1,7 @@
 import { getConfig } from "@/config";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(_: Request) {
   const config = await getConfig()
 

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import { AlertGroups, AlertGroupsSkeleton } from "./alert-groups";
 import { AlertModal } from "./alert-modal";
-import { Group, LabelFilter } from "./types";
+import { Group } from "./types";
 import { alertFilter, alertSort, parseAsFilter } from "./utils";
 import {
   Select,

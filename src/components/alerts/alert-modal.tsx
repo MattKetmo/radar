@@ -13,6 +13,12 @@ import {
   Check,
   CheckIcon,
   ClipboardCopy,
+  SquareArrowOutUpRight,
+  ZoomInIcon,
+} from "lucide-react";
+  Check,
+  CheckIcon,
+  ClipboardCopy,
   SearchIcon,
   Square,
   SquareArrowOutUpRight,
@@ -39,7 +45,8 @@ type Props = {
 
 export function AlertModal(props: Props) {
   const { alert } = props;
-  const { summary } = alert?.annotations || {};
+  const { alert } = props;
+  const { summary: _summary } = alert?.annotations || {};
   const [selectedAlertId, setSelectedAlertId] = useQueryState("alert", {
     defaultValue: "",
   });
@@ -58,7 +65,6 @@ export function AlertModal(props: Props) {
 
   return (
     <Sheet open={!!selectedAlertId} onOpenChange={close}>
-      {/* <SheetTrigger>Open</SheetTrigger> */}
       <SheetContent className="w-screen">
         <div className="flex flex-col h-screen">
           <SheetHeader className="shrink-0">
@@ -66,7 +72,7 @@ export function AlertModal(props: Props) {
               {alert && <AlertSeverity alert={alert} />}
               {alert?.labels.alertname}
             </SheetTitle>
-            <SheetDescription className="text-left">{summary}</SheetDescription>
+            <SheetDescription className="text-left">{_summary}</SheetDescription>
           </SheetHeader>
 
           <div className="overflow-auto pb-10 px-6">

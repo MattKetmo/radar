@@ -1,9 +1,9 @@
-import { LoaderCircle, Plus, RefreshCcw, TriangleAlert } from 'lucide-react';
+import { LoaderCircle, RefreshCcw, TriangleAlert } from 'lucide-react';
 import AppHeader from '@/components/layout/app-header';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import Link from 'next/link';
-import { Button } from '../ui/button';
+
+
 
 type Props = {
   errors: Record<string, string>;
@@ -22,27 +22,6 @@ export function Header(props: Props) {
         <div className="font-medium">
           Silences
         </div>
-        {/* <div className="inline-flex h-8 items-center justify-center rounded-md bg-accent p-1 text-accent-foreground">
-          <Link
-            href="/silences"
-            data-state="active"
-            className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-0.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-xs"
-          >
-            All
-          </Link>
-          <Link
-            href="/silences?state=expired"
-            className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-0.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-xs"
-          >
-            Expired
-          </Link>
-        </div>
-        <div>
-          <Button size="xs" className='pl-4 pr-2 py-0.5'>
-            New silence
-            <Plus className='' />
-          </Button>
-        </div> */}
         <div>
           {
             !loading && Object.entries(errors).length > 0 && (

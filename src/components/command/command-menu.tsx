@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { useRouter } from "next/navigation"
-import { Bell, ChevronRight, CircleSlash2, Settings2, SquareDot } from "lucide-react"
+import { Bell, CircleSlash2, Settings2, SquareDot } from "lucide-react"
 import { useConfig } from "@/contexts/config"
 
 const navigation = [

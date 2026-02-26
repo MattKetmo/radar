@@ -92,10 +92,6 @@ export function alertSort(a: Alert, b: Alert) {
   const severityB = severityOrder[b.labels.severity as keyof typeof severityOrder] || severityOrder.default
 
   if (severityA === severityB) {
-    // if (a.labels.alertname === b.labels.alertname) {
-    return new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime()
-    // }
-    // return a.labels.alertname.localeCompare(b.labels.alertname)
   }
 
   return severityA - severityB

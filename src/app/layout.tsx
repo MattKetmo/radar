@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ConfigProvider } from "@/contexts/config";
@@ -6,10 +6,10 @@ import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { AppLayout } from "@/components/layout/app-layout";
 import { AlertsProvider } from "@/contexts/alerts";
+import { SilencesProvider } from "@/contexts/silences";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LogoutDetectedDialog } from "@/components/layout/logout-detected-dialog";
 
-export const dynamic = "force-dynamic";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -58,10 +58,12 @@ export default async function RootLayout({
             <TooltipProvider delayDuration={150}>
               <ConfigProvider>
                 <AlertsProvider>
-                  <AppLayout>
-                    {children}
-                  </AppLayout>
-                  <LogoutDetectedDialog />
+                  <SilencesProvider>
+                    <AppLayout>
+                      {children}
+                    </AppLayout>
+                    <LogoutDetectedDialog />
+                  </SilencesProvider>
                 </AlertsProvider>
               </ConfigProvider>
             </TooltipProvider>
