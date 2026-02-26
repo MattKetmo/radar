@@ -61,6 +61,15 @@ export function CreateSilenceDialog() {
   const [silenceId, setSilenceId] = useState<string | undefined>(undefined)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewExpanded, setPreviewExpanded] = useState(false)
+  const [clusterFilter, setClusterFilter] = useState("")
+
+  const filteredClusters = useMemo(
+    () =>
+      [...config.clusters]
+        .filter((c) => c.name.toLowerCase().includes(clusterFilter.toLowerCase()))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [config.clusters, clusterFilter]
+  )
 
   const previewResults = useMemo(() => {
     const validMatchers = matchers.filter((m) => m.name.trim() !== "")
@@ -92,6 +101,7 @@ export function CreateSilenceDialog() {
   // Initialize form state when dialog opens
   useEffect(() => {
     if (!isOpen) return
+    setClusterFilter("")
 
     const now = new Date()
 
@@ -276,8 +286,32 @@ export function CreateSilenceDialog() {
             <Label asChild>
               <legend>Clusters</legend>
             </Label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Filter clusters..."
+                value={clusterFilter}
+                onChange={(e) => setClusterFilter(e.target.value)}
+                className="h-7 flex-1 rounded-md border border-input bg-transparent px-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+              <button
+                type="button"
+                className="text-xs text-muted-foreground hover:text-foreground"
+                onClick={() => setSelectedClusters(filteredClusters.map(c => c.name))}
+              >
+                Select all
+              </button>
+              <span className="text-xs text-muted-foreground">/</span>
+              <button
+                type="button"
+                className="text-xs text-muted-foreground hover:text-foreground"
+                onClick={() => setSelectedClusters([])}
+              >
+                Deselect all
+              </button>
+            </div>
             <div className="flex flex-col gap-2">
-              {config.clusters.map((cluster) => (
+              {filteredClusters.map((cluster) => (
                 <label
                   key={cluster.name}
                   className="flex items-center gap-2 cursor-pointer select-none"
@@ -305,6 +339,57 @@ export function CreateSilenceDialog() {
             </Label>
             <MatcherBuilder matchers={matchers} onChange={setMatchers} />
           </fieldset>
+
+          {/* Alert Preview */}
+          {totalMatched > 0 && (
+            <div className="space-y-2">
+              <button
+                type="button"
+                className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setPreviewExpanded(!previewExpanded)}
+              >
+                <ChevronRight
+                  className={cn(
+                    "h-4 w-4 transition-transform",
+                    previewExpanded && "rotate-90"
+                  )}
+                />
+                Matching alerts ({totalMatched})
+              </button>
+              {previewExpanded && (
+                <div className="space-y-3">
+                  {previewResults.map((result) => (
+                    <div key={result.cluster}>
+                      {previewResults.length > 1 && (
+                        <div className="text-xs font-medium text-muted-foreground mb-1">
+                          {result.cluster}
+                        </div>
+                      )}
+                      <div className="space-y-1">
+                        {result.alerts.map((alert) => (
+                          <div
+                            key={`${alert.labels?.alertname}-${alert.fingerprint}`}
+                            className="flex items-center gap-2 bg-secondary px-3 py-2 rounded-md text-sm"
+                          >
+                            <AlertSeverity alert={alert} />
+                            <div className="truncate">{alert.labels?.alertname}</div>
+                            <div className="grow" />
+                            <time
+                              className="w-[65px] text-right text-xs shrink-0 text-nowrap text-muted-foreground"
+                              dateTime={new Date(alert.startsAt).toISOString()}
+                              title={new Date(alert.startsAt).toISOString()}
+                            >
+                              {formatDate(new Date(alert.startsAt), "en")}
+                            </time>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Duration */}
           <fieldset className="space-y-3">
@@ -339,57 +424,6 @@ export function CreateSilenceDialog() {
               rows={3}
             />
           </div>
-
-          {/* Alert Preview */}
-          {totalMatched > 0 && (
-            <div className="space-y-2">
-              <button
-                type="button"
-                className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setPreviewExpanded(!previewExpanded)}
-              >
-                <ChevronRight
-                  className={cn(
-                    "h-4 w-4 transition-transform",
-                    previewExpanded && "rotate-90"
-                  )}
-                />
-                Matching alerts ({totalMatched})
-              </button>
-              {previewExpanded && (
-                <div className="space-y-3 max-h-[200px] overflow-y-auto">
-                  {previewResults.map((result) => (
-                    <div key={result.cluster}>
-                      {previewResults.length > 1 && (
-                        <div className="text-xs font-medium text-muted-foreground mb-1">
-                          {result.cluster}
-                        </div>
-                      )}
-                      <div className="space-y-1">
-                        {result.alerts.map((alert) => (
-                          <div
-                            key={`${alert.labels?.alertname}-${alert.fingerprint}`}
-                            className="flex items-center gap-2 bg-secondary px-3 py-2 rounded-md text-sm"
-                          >
-                            <AlertSeverity alert={alert} />
-                            <div className="truncate">{alert.labels?.alertname}</div>
-                            <div className="grow" />
-                            <time
-                              className="w-[65px] text-right text-xs shrink-0 text-nowrap text-muted-foreground"
-                              dateTime={new Date(alert.startsAt).toISOString()}
-                              title={new Date(alert.startsAt).toISOString()}
-                            >
-                              {formatDate(new Date(alert.startsAt), "en")}
-                            </time>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         <DialogFooter className="shrink-0 border-t pt-4">

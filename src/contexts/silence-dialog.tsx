@@ -82,7 +82,11 @@ export function SilenceDialogProvider({ children }: { children: React.ReactNode 
     setIsOpen(true)
   }
 
-  const close = () => setIsOpen(false)
+  const close = () => {
+    setIsOpen(false)
+    setPrefillData(null)
+    setPrefillClusters([])
+  }
 
   return (
     <SilenceDialogContext.Provider value={{ isOpen, mode, prefillData, prefillClusters, openCreate, openEdit, openFromAlert, close }}>
