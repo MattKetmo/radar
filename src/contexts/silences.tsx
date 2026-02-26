@@ -17,9 +17,11 @@ type SilencesContextType = {
 
 const SilencesContext = createContext<SilencesContextType | undefined>(undefined)
 
+const silencesSchema = z.array(SilenceSchema)
+
 export function SilencesProvider({ children }: { children: React.ReactNode }) {
   const { data: silences, errors, loading, logoutDetected, refreshInterval, setRefreshInterval, refresh } =
-    useClusterData<Silence>('/silences', z.array(SilenceSchema))
+    useClusterData<Silence>('/silences', silencesSchema)
 
   const value = useMemo(
     () => ({ silences, errors, loading, logoutDetected, refreshInterval, setRefreshInterval, refreshSilences: refresh }),

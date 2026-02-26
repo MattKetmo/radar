@@ -18,10 +18,12 @@ interface AlertsContextProps {
 
 const AlertsContext = createContext<AlertsContextProps | undefined>(undefined)
 
+const alertsSchema = z.array(AlertSchema)
+
 export function AlertsProvider({ children }: { children: React.ReactNode }) {
   const { config } = useConfig()
   const { data, errors, loading, logoutDetected, refreshInterval, setRefreshInterval, refresh } =
-    useClusterData<Alert>('/alerts', z.array(AlertSchema))
+    useClusterData<Alert>('/alerts', alertsSchema)
 
   const alerts = useMemo(() => {
     const result: Record<string, Alert[]> = {}
