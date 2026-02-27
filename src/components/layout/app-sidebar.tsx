@@ -1,13 +1,14 @@
 'use client'
 
 import Link from "next/link"
-import { Bell, ChevronRight, CircleSlash2, MessageCircleQuestion, Settings2, SquareArrowOutUpRight, SquareDot } from "lucide-react"
+import { Bell, ChevronRight, CircleSlash2, MessageCircleQuestion, Plus, Settings2, SquareArrowOutUpRight, SquareDot } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuBadge,
   SidebarMenuButton,
@@ -20,8 +21,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useConfig } from "@/contexts/config"
 import { useAlerts } from "@/contexts/alerts"
 import { alertFilter, flattenAlerts } from "@/components/alerts/utils"
+import { useSilenceDialog } from "@/contexts/silence-dialog"
 import { ViewConfig } from "@/config/types"
 import { usePathname } from "next/navigation"
+import { RadarLogo } from "./radar-logo"
 
 const items = [
   {
@@ -47,6 +50,7 @@ export function AppSidebar() {
   const pathname = usePathname()
   const { setOpenMobile } = useSidebar();
   const { config } = useConfig()
+  const { openCreate } = useSilenceDialog()
   const { views, viewCategories } = config
   const { alerts } = useAlerts()
 
@@ -69,11 +73,12 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      {/* <SidebarHeader>
-        <div className="flex items-center justify-end">
-          <SidebarTrigger />
-        </div>
-      </SidebarHeader> */}
+      <SidebarHeader>
+        <Link href="/" className="flex items-center gap-2 px-2 py-2">
+          <RadarLogo className="shrink-0 size-6 rounded" />
+          <span className="font-semibold text-lg tracking-tight">Radar</span>
+        </Link>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
@@ -91,6 +96,12 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => { openCreate(); setOpenMobile(false) }}>
+                  <Plus />
+                  <span>New Silence</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <a target="_blank" href="https://github.com/MattKetmo/radar/issues">

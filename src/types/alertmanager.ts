@@ -34,3 +34,27 @@ export const SilenceSchema = z.object({
 })
 
 export type Silence = z.infer<typeof SilenceSchema>
+
+export const SilenceCreateSchema = z.object({
+  id: z.string().optional(),
+  matchers: z.array(z.object({
+    name: z.string().min(1),
+    value: z.string(),
+    isRegex: z.boolean(),
+    isEqual: z.boolean(),
+  })).min(1),
+  startsAt: z.string(),
+  endsAt: z.string(),
+  createdBy: z.string().min(1),
+  comment: z.string().min(1),
+})
+
+export type SilenceCreate = z.infer<typeof SilenceCreateSchema>
+
+export const SilenceCreateResponseSchema = z.object({
+  silenceID: z.string(),
+})
+
+export type SilenceCreateResponse = z.infer<typeof SilenceCreateResponseSchema>
+
+export type MatcherOperator = '=' | '!=' | '=~' | '!~'

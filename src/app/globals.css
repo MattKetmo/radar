@@ -54,6 +54,12 @@
   --color-sidebar-border: hsl(var(--sidebar-border));
   --color-sidebar-ring: hsl(var(--sidebar-ring));
 
+  --color-severity-critical: var(--severity-critical);
+  --color-severity-error: var(--severity-error);
+  --color-severity-warning: var(--severity-warning);
+  --color-severity-info: var(--severity-info);
+  --color-severity-none: var(--severity-none);
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -112,12 +118,6 @@
   }
 }
 
-@layer utilities {
-  body {
-    font-family: Arial, Helvetica, sans-serif;
-  }
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -144,7 +144,12 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+  --radius: 0.5rem;
+    --severity-critical: #dc2626;
+    --severity-error: #ef4444;
+    --severity-warning: #f59e0b;
+    --severity-info: #60a5fa;
+    --severity-none: #64748b;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -157,6 +162,11 @@
   }
 
   .dark {
+    --severity-critical: #b91c1c;
+    --severity-error: #dc2626;
+    --severity-warning: #d97706;
+    --severity-info: #3b82f6;
+    --severity-none: #475569;
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;

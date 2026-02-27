@@ -1,15 +1,30 @@
 import Link from "next/link"
 import { useQueryState } from "nuqs"
 import { formatDistanceToNowStrict } from "date-fns"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 import { Alert, Silence } from "@/types/alertmanager"
 import { useAlerts } from "@/contexts/alerts"
+import { useSilenceDialog } from "@/contexts/silence-dialog"
+import { useSilences } from "@/contexts/silences"
 import { AlertSeverity } from "@/components/alerts/alert-severity"
 import { formatDate } from "@/lib/date"
 import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useState } from "react"
-import { ArrowRightFromLine } from "lucide-react"
+import { ArrowRightFromLine, Pencil, Trash2Icon } from "lucide-react"
 import { matchAlerts } from "./utils"
 
 type Props = {
@@ -36,6 +51,31 @@ export function SilenceModal(props: Props) {
   const { cluster, silence } = props
   const { alerts } = useAlerts()
   const [selectedSilenceId, setSelectedSilenceId] = useQueryState('silence', { defaultValue: '' })
+  const [isExpiring, setIsExpiring] = useState(false)
+  const { openEdit } = useSilenceDialog()
+  const { refreshSilences } = useSilences()
+
+  const handleExpire = async () => {
+    if (!silence || !cluster) return
+    setIsExpiring(true)
+    try {
+      const response = await fetch(`/api/clusters/${cluster}/silences/${silence.id}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(errorText || `HTTP ${response.status}`)
+      }
+      toast.success('Silence expired')
+      setSelectedSilenceId(null)
+      await refreshSilences()
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error'
+      toast.error(`Failed to expire silence: ${message}`)
+    } finally {
+      setIsExpiring(false)
+    }
+  }
 
   const matchedAlerts = silence ? matchAlerts(silence, alerts[cluster ?? '']) : []
   const progress = silence ? calculateProgress(silence.startsAt, silence.endsAt) : 0;
@@ -50,6 +90,34 @@ export function SilenceModal(props: Props) {
               <span>Silence</span>
               <span className="font-mono font-medium text-sm">{silence?.id}</span>
             </SheetTitle>
+            {silence && (
+              <div className="flex gap-2 pt-2">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="xs" disabled={isExpiring}>
+                      <Trash2Icon />
+                      Expire Silence
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Expire this silence?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will immediately expire the silence. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleExpire}>Expire</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <Button variant="outline" size="xs" disabled={isExpiring} onClick={() => openEdit(silence, cluster!)}>
+                  <Pencil />
+                  Edit
+                </Button>
+              </div>
+            )}
             {/* <SheetDescription className="text-left">
               {silence?.comment}
             </SheetDescription> */}

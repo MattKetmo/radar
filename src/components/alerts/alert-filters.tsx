@@ -59,43 +59,78 @@ function AddFilterButton(props: {
   const { addFilter, label } = props;
   const [isEditing, setIsEditing] = useState(false);
   const [filterText, setFilterText] = useState("");
+  const [hasError, setHasError] = useState(false);
+
+  const tryParse = (text: string) => {
+    const match = text.match(/^([^=!~]+)([=!~]+)(.+)$/);
+    if (!match) return null;
+    const [, labelKey, operator, value] = match;
+    return {
+      label: labelKey.trim(),
+      value: value.trim(),
+      exclude: operator.startsWith("!"),
+      regex: operator.includes("~"),
+    };
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Parse filter text (simple implementation - can be enhanced)
-    const match = filterText.match(/^([^=!~]+)([=!~]+)(.+)$/);
-    if (match) {
-      const [, label, operator, value] = match;
-      const isExclude = operator.startsWith("!");
-      const isRegex = operator.includes("~");
-
-      addFilter({
-        label: label.trim(),
-        value: value.trim(),
-        exclude: isExclude,
-        regex: isRegex,
-      });
-
+    const parsed = tryParse(filterText);
+    if (parsed) {
+      addFilter(parsed);
       setFilterText("");
+      setHasError(false);
       setIsEditing(false);
+    } else {
+      setHasError(true);
+    }
+  };
+
+  const handleBlur = () => {
+    // Close only if input is empty; keep open with error if text was entered
+    if (!filterText.trim()) {
+      setIsEditing(false);
+      setHasError(false);
+    } else {
+      const parsed = tryParse(filterText);
+      if (!parsed) setHasError(true);
     }
   };
 
   if (isEditing) {
     return (
-      <form onSubmit={handleSubmit} className="flex">
-        <input
-          type="text"
-          value={filterText}
-          onChange={(e) => setFilterText(e.target.value)}
-          placeholder="label=value"
-          aria-label="Add filter"
-          className="px-2 py-1 text-sm border rounded-sm focus:outline-hidden focus:ring-1 focus:ring-primary"
-          autoFocus
-          onBlur={() => setIsEditing(false)}
-        />
-      </form>
+      <div className="flex flex-col gap-1">
+        <form onSubmit={handleSubmit} className="flex">
+          <input
+            type="text"
+            value={filterText}
+            onChange={(e) => { setFilterText(e.target.value); setHasError(false); }}
+            placeholder="label=value"
+            aria-label="Add filter"
+            aria-describedby={hasError ? "filter-error" : "filter-hint"}
+            aria-invalid={hasError}
+            className={cn(
+              "px-2 py-1 text-sm border rounded-sm focus:outline-hidden focus:ring-1 focus:ring-primary",
+              hasError && "border-destructive focus:ring-destructive"
+            )}
+            autoFocus
+            onBlur={handleBlur}
+          />
+        </form>
+        {/* {hasError ? (
+          <span id="filter-error" className="text-xs text-destructive">
+            Use format: <code className="font-mono">label=value</code>,{" "}
+            <code className="font-mono">label!=value</code>, or{" "}
+            <code className="font-mono">label=~regex</code>
+          </span>
+        ) : (
+          <span id="filter-hint" className="text-xs text-muted-foreground">
+            <code className="font-mono">label=value</code> ·{" "}
+            <code className="font-mono">label!=value</code> ·{" "}
+            <code className="font-mono">label=~regex</code>
+          </span>
+        )} */}
+      </div>
     );
   }
 

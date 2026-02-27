@@ -17,6 +17,7 @@ import { alertFilter, alertSort, parseAsFilter } from "./utils";
 import GroupSelect from "./group-select";
 import { useHotkeys } from "react-hotkeys-hook";
 import { AlertFilters } from "./alert-filters";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Props = {
   view: string;
@@ -114,17 +115,17 @@ export function AlertsTemplate(props: Props) {
     }
   }, [selectedAlertId, flattenedAlerts]);
 
-  // 404 on server side if view not found
-  if (!config.views[viewName]) {
-    return notFound();
-  }
-
   const labels = useMemo(
     () => Array.from(
       new Set(flattenedAlerts.flatMap((alert) => Object.keys(alert.labels)))
     ).sort(),
     [flattenedAlerts]
   );
+
+  // 404 on server side if view not found
+  if (!config.views[viewName]) {
+    return notFound();
+  }
 
   if (!view) return null;
 
@@ -135,30 +136,16 @@ export function AlertsTemplate(props: Props) {
           <div className="font-medium">Alerts</div>
           <div className="text-muted-foreground">/</div>
           <div className="truncate">{view.name ? view.name : viewName}</div>
-          <div className="hidden sm:inline-flex ml-2 h-8 items-center justify-center rounded-md bg-accent p-1 text-accent-foreground" role="tablist">
-            <button
-              role="tab"
-              aria-selected={alertState === 'active'}
-              data-state={alertState === "inactive" ? "" : "active"}
-              onClick={() => {
-                setAlertState("active");
-              }}
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-0.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-xs data-[state=active]:border data-[state=active]:border-border/20"
-            >
-              Active
-            </button>
-            <button
-              role="tab"
-              aria-selected={alertState === 'inactive'}
-              data-state={alertState === "inactive" ? "active" : ""}
-              onClick={() => {
-                setAlertState("inactive");
-              }}
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-0.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-xs data-[state=active]:border data-[state=active]:border-border/20"
-            >
-              Inactive
-            </button>
-          </div>
+          <Tabs
+            value={alertState}
+            onValueChange={(v) => setAlertState(v)}
+            className="ml-2"
+          >
+            <TabsList className="h-8">
+              <TabsTrigger value="active" className="text-xs px-3 py-0.5">Active</TabsTrigger>
+              <TabsTrigger value="inactive" className="text-xs px-3 py-0.5">Inactive</TabsTrigger>
+            </TabsList>
+          </Tabs>
           <RefreshControls
             loading={loading}
             errors={errors}
@@ -169,7 +156,7 @@ export function AlertsTemplate(props: Props) {
         </div>
       </AppHeader>
 
-      <div className="flex text-sm items-center px-2 lg:px-6 border-b w-full min-h-[45px] shrink-0 bg-400">
+      <div className="flex text-sm items-center px-2 lg:px-6 border-b w-full min-h-[45px] shrink-0 bg-background">
         <AlertFilters filters={filters || []} setFilters={setFilters} />
         <div className="grow" />
         <div className="flex items-center">

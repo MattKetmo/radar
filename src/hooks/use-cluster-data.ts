@@ -13,8 +13,10 @@ export function useClusterData<T>(
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [logoutDetected, setLogoutDetected] = useState(false)
+  const [lastFetchResult, setLastFetchResult] = useState<boolean | null>(null)
   const [refreshInterval, setRefreshInterval] = useState(30)
   const abortRef = useRef<AbortController | null>(null)
+  const failCountRef = useRef<number>(0)
 
   const fetchData = useCallback(async () => {
     if (abortRef.current) abortRef.current.abort()
@@ -51,6 +53,15 @@ export function useClusterData<T>(
     setData(newData)
     setErrors(newErrors)
     setLoading(false)
+
+    // Update failure count and trigger polling interval recalculation
+    if (Object.keys(newErrors).length > 0) {
+      failCountRef.current += 1
+      setLastFetchResult(false)
+    } else {
+      failCountRef.current = 0
+      setLastFetchResult(true)
+    }
   }, [config.clusters, endpoint, schema])
 
   const refresh = useCallback(async () => {
@@ -66,14 +77,15 @@ export function useClusterData<T>(
     }
   }, [fetchData])
 
-  // Polling: re-fetch every refreshInterval seconds
+  // Polling: re-fetch every refreshInterval seconds, with exponential backoff on failures
   useEffect(() => {
     if (refreshInterval === 0) return
+    const effectiveInterval = Math.min(refreshInterval * Math.pow(2, failCountRef.current), 300) * 1000
     const id = setInterval(() => {
       fetchData()
-    }, refreshInterval * 1000)
+    }, effectiveInterval)
     return () => clearInterval(id)
-  }, [fetchData, refreshInterval])
+  }, [fetchData, refreshInterval, lastFetchResult])
 
   const value = useMemo(
     () => ({ data, errors, loading, logoutDetected, refreshInterval, setRefreshInterval, refresh }),

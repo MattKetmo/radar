@@ -1,40 +1,35 @@
 import { cn } from "@/lib/utils"
 import { Alert } from "@/types/alertmanager"
 
+type SeverityConfig = {
+  bgClass: string
+  text: string
+  darkText?: string
+}
+
+const severityMap: Record<string, SeverityConfig> = {
+  critical: { bgClass: "bg-severity-critical", text: "CRIT" },
+  error:    { bgClass: "bg-severity-error",    text: "ERR"  },
+  warning:  { bgClass: "bg-severity-warning",  text: "WARN", darkText: "text-black dark:text-black" },
+  info:     { bgClass: "bg-severity-info",      text: "INFO" },
+  none:     { bgClass: "bg-severity-none",      text: "NONE" },
+}
+
+const fallback: SeverityConfig = { bgClass: "bg-foreground", text: "???" }
+
 export function AlertSeverity({ alert }: { alert: Alert }) {
   const { severity } = alert.labels
-
-  let color = 'bg-black'
-  let text = '???'
-
-  switch (severity) {
-    case 'critical':
-      color = 'bg-red-600'
-      text = 'CRIT'
-      break
-    case 'error':
-      color = 'bg-red-500'
-      text = 'ERR'
-      break
-    case 'warning':
-      color = 'bg-orange-300 dark:text-black'
-      text = 'WARN'
-      break
-    case 'info':
-      color = 'bg-blue-400'
-      text = 'INFO'
-      break
-    case 'none':
-      color = 'bg-slate-500'
-      text = 'NONE'
-      break
-  }
+  const { bgClass, text, darkText } = severityMap[severity] ?? fallback
 
   return (
     <div
       title={severity}
       aria-label={`Severity: ${severity}`}
-      className={cn("text-center text-white text-xs px-1 py-1 rounded-sm shrink-0 font-mono w-12", color)}
+      className={cn(
+        "text-center text-white text-xs px-1 py-1 rounded-sm shrink-0 font-mono w-12",
+        bgClass,
+        darkText
+      )}
     >
       {text}
     </div>

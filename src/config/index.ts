@@ -12,7 +12,8 @@ export const getConfig = memoize(async function () {
 
   const validatedConfig = ConfigSchema.safeParse(resolvedConfig)
   if (!validatedConfig.success) {
-    throw new Error('Invalid config file: ' + validatedConfig.error.issues)
+    const issues = validatedConfig.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ')
+    throw new Error('Invalid config file: ' + issues)
   }
 
   const config = validatedConfig.data

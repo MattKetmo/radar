@@ -8,10 +8,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { Alert } from "@/types/alertmanager";
+import { useSilenceDialog } from "@/contexts/silence-dialog";
 import {
   Check,
   CheckIcon,
+  CircleSlash2,
   ClipboardCopy,
   SquareArrowOutUpRight,
   ZoomInIcon,
@@ -38,6 +41,8 @@ type Props = {
 export function AlertModal(props: Props) {
   const { alert } = props;
 
+  const { openFromAlert } = useSilenceDialog();
+
   const { summary: _summary, description: _description } = alert?.annotations || {};
   const [selectedAlertId, setSelectedAlertId] = useQueryState("alert", {
     defaultValue: "",
@@ -58,13 +63,26 @@ export function AlertModal(props: Props) {
   return (
     <Sheet open={!!selectedAlertId} onOpenChange={close}>
       <SheetContent className="w-screen">
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col h-full">
           <SheetHeader className="shrink-0">
             <SheetTitle className="flex gap-2 items-center">
               {alert && <AlertSeverity alert={alert} />}
               {alert?.labels.alertname}
             </SheetTitle>
             <SheetDescription className="text-left">{_summary}</SheetDescription>
+            {alert && (
+              <div className="flex gap-2 mt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="xs"
+                  onClick={() => openFromAlert(alert.labels, alert.labels['cluster'] || '')}
+                >
+                  <CircleSlash2 />
+                  Silence this alert
+                </Button>
+              </div>
+            )}
           </SheetHeader>
 
           <div className="overflow-auto pb-10 px-6">
