@@ -24,7 +24,7 @@ import { AlertSeverity } from "@/components/alerts/alert-severity"
 import { formatDate } from "@/lib/date"
 import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useState } from "react"
-import { ArrowRightFromLine, CircleSlash2, Pencil, Trash2Icon } from "lucide-react"
+import { ArrowRightFromLine, Pencil, Trash2Icon } from "lucide-react"
 import { matchAlerts } from "./utils"
 
 type Props = {

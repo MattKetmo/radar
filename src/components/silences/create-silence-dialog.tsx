@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { useHotkeys } from "react-hotkeys-hook"
 
 import { SilenceCreateSchema } from "@/types/alertmanager"
-import type { Alert, MatcherOperator, Silence } from "@/types/alertmanager"
+import type {  MatcherOperator, Silence } from "@/types/alertmanager"
 import { useConfig } from "@/contexts/config"
 import { useSilences } from "@/contexts/silences"
 import { useAlerts } from "@/contexts/alerts"
