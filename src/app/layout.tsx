@@ -66,9 +66,9 @@ export default async function RootLayout({
                       <AppLayout>
                         {children}
                       </AppLayout>
+                      <CreateSilenceDialog />
                       <LogoutDetectedDialog />
                       <Toaster />
-                      <CreateSilenceDialog />
                     </SilenceDialogProvider>
                   </SilencesProvider>
 

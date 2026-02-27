@@ -280,7 +280,7 @@ export function CreateSilenceDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-2 overflow-y-auto flex-1">
+        <div className="space-y-6 py-2 no-scrollbar -mx-4 max-h-[50vh] overflow-y-auto px-4 flex-1">
           {/* Clusters */}
           <fieldset className="space-y-3">
             <Label asChild>
@@ -426,7 +426,7 @@ export function CreateSilenceDialog() {
           </div>
         </div>
 
-        <DialogFooter className="shrink-0 border-t pt-4">
+        <DialogFooter className="bg-muted/50 -mx-6 -mb-6 flex flex-col-reverse gap-2 rounded-b-xl border-t px-6 py-4 sm:flex-row sm:justify-end">
           <Button
             type="button"
             variant="outline"
