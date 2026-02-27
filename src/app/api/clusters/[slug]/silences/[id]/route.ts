@@ -32,7 +32,7 @@ export async function DELETE(
       : null;
   url.username = "";
   url.password = "";
-  const sanitizedEndpoint = url.toString();
+  const sanitizedEndpoint = url.toString().replace(/\/$/, '');
 
   const headers = new Headers();
   if (auth) {

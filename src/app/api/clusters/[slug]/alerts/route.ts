@@ -25,7 +25,7 @@ export async function GET(
   const auth = url.username && url.password ? `${url.username}:${url.password}` : null;
   url.username = '';
   url.password = '';
-  const sanitizedEndpoint = url.toString();
+  const sanitizedEndpoint = url.toString().replace(/\/$/, '');
 
   const headers = new Headers();
   if (auth) {
