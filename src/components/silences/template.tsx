@@ -32,7 +32,7 @@ export default function SilencesTemplate() {
   const silenceGroups = Object.entries(silences).map(([cluster, clusterSilences]) => ({
     name: cluster,
     silences: clusterSilences
-  }))
+  })).sort((a, b) => a.name.localeCompare(b.name))
 
   // Select alert by ID (fingerprint)
   useEffect(() => {
