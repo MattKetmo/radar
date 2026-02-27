@@ -62,6 +62,9 @@ export function SilenceDialogProvider({ children }: { children: React.ReactNode 
     setIsOpen(true)
   }
 
+  // TODO: make this configurable
+  const ignoredLabels = ['cluster', 'prometheus', 'uid', 'instance', 'endpoint']
+
   const openFromAlert = (labels: Record<string, string>, cluster: string) => {
     const now = new Date()
     const endsAt = new Date(now.getTime() + 60 * 60 * 1000) // 1h default
@@ -70,6 +73,7 @@ export function SilenceDialogProvider({ children }: { children: React.ReactNode 
       selectedClusters: [cluster],
       matchers: Object.entries(labels)
         .filter(([name]) => !name.startsWith('@'))  // skip internal labels
+        .filter(([name]) => !ignoredLabels.includes(name))
         .map(([name, value]) => ({ name, value, operator: '=' as MatcherOperator })),
       durationMode: 'preset',
       durationPreset: 60,

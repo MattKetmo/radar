@@ -24,7 +24,7 @@ import { AlertSeverity } from "@/components/alerts/alert-severity"
 import { formatDate } from "@/lib/date"
 import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useState } from "react"
-import { ArrowRightFromLine } from "lucide-react"
+import { ArrowRightFromLine, CircleSlash2, Pencil, Trash2Icon } from "lucide-react"
 import { matchAlerts } from "./utils"
 
 type Props = {
@@ -94,7 +94,8 @@ export function SilenceModal(props: Props) {
               <div className="flex gap-2 pt-2">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="sm" disabled={isExpiring}>
+                    <Button variant="destructive" size="xs" disabled={isExpiring}>
+                      <Trash2Icon />
                       Expire Silence
                     </Button>
                   </AlertDialogTrigger>
@@ -111,7 +112,8 @@ export function SilenceModal(props: Props) {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-                <Button variant="outline" size="sm" disabled={isExpiring} onClick={() => openEdit(silence, cluster!)}>
+                <Button variant="outline" size="xs" disabled={isExpiring} onClick={() => openEdit(silence, cluster!)}>
+                  <Pencil />
                   Edit
                 </Button>
               </div>

@@ -63,7 +63,7 @@ export function AlertModal(props: Props) {
   return (
     <Sheet open={!!selectedAlertId} onOpenChange={close}>
       <SheetContent className="w-screen">
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col h-full">
           <SheetHeader className="shrink-0">
             <SheetTitle className="flex gap-2 items-center">
               {alert && <AlertSeverity alert={alert} />}
@@ -75,10 +75,10 @@ export function AlertModal(props: Props) {
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
-                  onClick={() => openFromAlert(alert.labels, alert.labels['@cluster'] || '')}
+                  size="xs"
+                  onClick={() => openFromAlert(alert.labels, alert.labels['cluster'] || '')}
                 >
-                  <CircleSlash2 size={14} />
+                  <CircleSlash2 />
                   Silence this alert
                 </Button>
               </div>

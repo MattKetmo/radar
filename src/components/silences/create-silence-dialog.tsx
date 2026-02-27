@@ -269,7 +269,7 @@ export function CreateSilenceDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && close()}>
       <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-        <DialogHeader className="shrink-0">
+        <DialogHeader className="shrink-0 border-b -mx-6 px-6 pb-4">
           <DialogTitle>
             {mode === "edit" ? "Edit Silence" : "Create Silence"}
           </DialogTitle>
@@ -280,7 +280,7 @@ export function CreateSilenceDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-2 no-scrollbar -mx-4 max-h-[50vh] overflow-y-auto px-4 flex-1">
+        <div className="space-y-6 no-scrollbar -my-4 py-4 -mx-6 max-h-[50vh] overflow-y-auto px-6 flex-1">
           {/* Clusters */}
           <fieldset className="space-y-3">
             <Label asChild>

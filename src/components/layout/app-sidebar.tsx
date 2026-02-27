@@ -8,6 +8,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuBadge,
   SidebarMenuButton,
@@ -23,6 +24,7 @@ import { alertFilter, flattenAlerts } from "@/components/alerts/utils"
 import { useSilenceDialog } from "@/contexts/silence-dialog"
 import { ViewConfig } from "@/config/types"
 import { usePathname } from "next/navigation"
+import { RadarLogo } from "./radar-logo"
 
 const items = [
   {
@@ -71,11 +73,12 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      {/* <SidebarHeader>
-        <div className="flex items-center justify-end">
-          <SidebarTrigger />
-        </div>
-      </SidebarHeader> */}
+      <SidebarHeader>
+        <Link href="/" className="flex items-center gap-2 px-2 py-2">
+          <RadarLogo className="shrink-0 size-6 rounded" />
+          <span className="font-semibold text-lg tracking-tight">Radar</span>
+        </Link>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
