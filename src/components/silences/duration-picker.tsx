@@ -38,7 +38,7 @@ export function DurationPicker({
   onEndsAtChange,
 }: DurationPickerProps) {
   const [inputValue, setInputValue] = useState(
-    format(endsAt, "dd MMM yyyy, HH:mm")
+    format(endsAt, "yyyy-MM-dd HH:mm")
   )
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
@@ -48,7 +48,7 @@ export function DurationPicker({
   function handlePresetClick(minutes: number) {
     const newDate = addMinutes(new Date(), minutes)
     onEndsAtChange(newDate)
-    setInputValue(format(newDate, "dd MMM yyyy, HH:mm"))
+    setInputValue(format(newDate, "yyyy-MM-dd HH:mm"))
   }
 
   function handleInputChange(value: string) {
@@ -59,9 +59,9 @@ export function DurationPicker({
     const parsed = parseDurationInput(inputValue)
     if (parsed) {
       onEndsAtChange(parsed)
-      setInputValue(format(parsed, "dd MMM yyyy, HH:mm"))
+      setInputValue(format(parsed, "yyyy-MM-dd HH:mm"))
     } else {
-      setInputValue(format(endsAt, "dd MMM yyyy, HH:mm"))
+      setInputValue(format(endsAt, "yyyy-MM-dd HH:mm"))
     }
   }
 
@@ -79,7 +79,7 @@ export function DurationPicker({
     newDate.setSeconds(0)
     newDate.setMilliseconds(0)
     onEndsAtChange(newDate)
-    setInputValue(format(newDate, "dd MMM yyyy, HH:mm"))
+    setInputValue(format(newDate, "yyyy-MM-dd HH:mm"))
   }
 
   function handleCalendarTimeChange(type: "hour" | "minute", val: number) {
@@ -89,7 +89,7 @@ export function DurationPicker({
     newDate.setSeconds(0)
     newDate.setMilliseconds(0)
     onEndsAtChange(newDate)
-    setInputValue(format(newDate, "dd MMM yyyy, HH:mm"))
+    setInputValue(format(newDate, "yyyy-MM-dd HH:mm"))
   }
 
   const currentMinutes = differenceInMinutes(endsAt, new Date())
