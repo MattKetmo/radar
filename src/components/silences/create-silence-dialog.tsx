@@ -113,15 +113,8 @@ export function CreateSilenceDialog() {
           : [{ name: "", value: "", operator: "=" as MatcherOperator }]
       )
 
-      if (prefillData.durationMode === "custom") {
-        setStartsAt(prefillData.customStartsAt)
-        setEndsAt(prefillData.customEndsAt)
-      } else {
-        setStartsAt(now)
-        setEndsAt(
-          new Date(now.getTime() + prefillData.durationPreset * 60 * 1000)
-        )
-      }
+      setStartsAt(prefillData.startsAt)
+      setEndsAt(prefillData.endsAt)
 
       setAuthor(
         prefillData.author ||

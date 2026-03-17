@@ -7,10 +7,8 @@ export type SilenceFormData = {
   id?: string
   selectedClusters: string[]
   matchers: Array<{ name: string; value: string; operator: MatcherOperator }>
-  durationMode: 'preset' | 'custom'
-  durationPreset: number          // minutes
-  customStartsAt: Date
-  customEndsAt: Date
+  startsAt: Date
+  endsAt: Date
   author: string
   comment: string
 }
@@ -51,10 +49,8 @@ export function SilenceDialogProvider({ children }: { children: React.ReactNode 
         value: m.value,
         operator: m.isRegex ? (m.isEqual ? '=~' : '!~') : (m.isEqual ? '=' : '!='),
       })),
-      durationMode: 'custom',
-      durationPreset: 60,
-      customStartsAt: new Date(silence.startsAt),
-      customEndsAt: new Date(silence.endsAt),
+      startsAt: new Date(silence.startsAt),
+      endsAt: new Date(silence.endsAt),
       author: silence.createdBy,
       comment: silence.comment,
     })
@@ -75,10 +71,8 @@ export function SilenceDialogProvider({ children }: { children: React.ReactNode 
         .filter(([name]) => !name.startsWith('@'))  // skip internal labels
         .filter(([name]) => !ignoredLabels.includes(name))
         .map(([name, value]) => ({ name, value, operator: '=' as MatcherOperator })),
-      durationMode: 'preset',
-      durationPreset: 60,
-      customStartsAt: now,
-      customEndsAt: endsAt,
+      startsAt: now,
+      endsAt: endsAt,
       author: '',
       comment: '',
     })
