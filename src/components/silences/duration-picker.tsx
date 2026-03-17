@@ -127,6 +127,7 @@ export function DurationPicker({
                 selected={endsAt}
                 onSelect={handleCalendarDateSelect}
                 initialFocus
+                className="min-w-[17.5rem]"
               />
               <div className="flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x">
                 <ScrollArea className="w-64 sm:w-auto">
