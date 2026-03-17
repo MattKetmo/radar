@@ -4,7 +4,6 @@ import { Plus, X } from "lucide-react"
 
 import { MatcherOperator } from "@/types/alertmanager"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -13,13 +12,21 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+import { AutocompleteInput } from "./autocomplete-input"
 
 type MatcherBuilderProps = {
   matchers: Array<{ name: string; value: string; operator: MatcherOperator }>
   onChange: (matchers: Array<{ name: string; value: string; operator: MatcherOperator }>) => void
+  labelNames?: string[]
+  getValuesForLabel?: (name: string) => string[]
 }
 
-export function MatcherBuilder({ matchers, onChange }: MatcherBuilderProps) {
+export function MatcherBuilder({
+  matchers,
+  onChange,
+  labelNames,
+  getValuesForLabel,
+}: MatcherBuilderProps) {
   const updateMatcher = (
     index: number,
     field: "name" | "value" | "operator",
@@ -43,10 +50,11 @@ export function MatcherBuilder({ matchers, onChange }: MatcherBuilderProps) {
     <div className="flex flex-col gap-2">
       {matchers.map((matcher, i) => (
         <div key={i} className="flex items-center gap-2">
-          <Input
+          <AutocompleteInput
             placeholder="label name"
             value={matcher.name}
-            onChange={(e) => updateMatcher(i, "name", e.target.value)}
+            onChange={(val) => updateMatcher(i, "name", val)}
+            suggestions={labelNames ?? []}
             className="flex-1"
           />
           <Select
@@ -63,10 +71,11 @@ export function MatcherBuilder({ matchers, onChange }: MatcherBuilderProps) {
               <SelectItem value="!~">!~</SelectItem>
             </SelectContent>
           </Select>
-          <Input
+          <AutocompleteInput
             placeholder="value"
             value={matcher.value}
-            onChange={(e) => updateMatcher(i, "value", e.target.value)}
+            onChange={(val) => updateMatcher(i, "value", val)}
+            suggestions={getValuesForLabel?.(matcher.name) ?? []}
             className="flex-1"
           />
           <Button

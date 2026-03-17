@@ -94,6 +94,31 @@ export function CreateSilenceDialog() {
     }))
   }, [selectedClusters, matchers, cachedAlerts])
 
+  const { labelNames, getValuesForLabel } = useMemo(() => {
+    const names = new Set<string>()
+    const valuesByName = new Map<string, Set<string>>()
+
+    for (const clusterAlerts of Object.values(cachedAlerts)) {
+      for (const alert of clusterAlerts) {
+        for (const [name, value] of Object.entries(alert.labels)) {
+          if (name.startsWith('@')) continue
+
+          names.add(name)
+          if (!valuesByName.has(name)) {
+            valuesByName.set(name, new Set<string>())
+          }
+          valuesByName.get(name)?.add(value)
+        }
+      }
+    }
+
+    return {
+      labelNames: [...names].sort((a, b) => a.localeCompare(b)),
+      getValuesForLabel: (name: string) =>
+        [...(valuesByName.get(name) ?? [])].sort((a, b) => a.localeCompare(b)),
+    }
+  }, [cachedAlerts])
+
   const totalMatched = previewResults.reduce((sum, r) => sum + r.alerts.length, 0)
 
   // Initialize form state when dialog opens
@@ -333,7 +358,12 @@ export function CreateSilenceDialog() {
             <Label asChild>
               <legend>Matchers</legend>
             </Label>
-            <MatcherBuilder matchers={matchers} onChange={setMatchers} />
+            <MatcherBuilder
+              matchers={matchers}
+              onChange={setMatchers}
+              labelNames={labelNames}
+              getValuesForLabel={getValuesForLabel}
+            />
           </fieldset>
 
           {/* Alert Preview */}
