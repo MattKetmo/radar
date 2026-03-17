@@ -25,8 +25,8 @@ const PRESETS = [
 
 type DurationPickerProps = {
   startsAt: Date
-  endsAt: Date
-  onEndsAtChange: (date: Date) => void
+  endsAt: Date | null
+  onEndsAtChange: (date: Date | null) => void
 }
 
 export function DurationPicker({
@@ -35,15 +35,15 @@ export function DurationPicker({
   onEndsAtChange,
 }: DurationPickerProps) {
   const [inputValue, setInputValue] = useState(
-    format(endsAt, "yyyy-MM-dd HH:mm")
+    endsAt ? format(endsAt, "yyyy-MM-dd HH:mm") : ""
   )
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
   const hours = Array.from({ length: 24 }, (_, i) => i)
   const minutes = Array.from({ length: 12 }, (_, i) => i * 5)
 
-  function handlePresetClick(minutes: number) {
-    const newDate = addMinutes(new Date(), minutes)
+  function handlePresetClick(presetMinutes: number) {
+    const newDate = addMinutes(new Date(), presetMinutes)
     onEndsAtChange(newDate)
     setInputValue(format(newDate, "yyyy-MM-dd HH:mm"))
   }
@@ -53,12 +53,18 @@ export function DurationPicker({
   }
 
   function handleInputBlur() {
+    if (!inputValue.trim()) {
+      onEndsAtChange(null)
+      return
+    }
     const parsed = parseDurationInput(inputValue)
     if (parsed) {
       onEndsAtChange(parsed)
       setInputValue(format(parsed, "yyyy-MM-dd HH:mm"))
-    } else {
+    } else if (endsAt) {
       setInputValue(format(endsAt, "yyyy-MM-dd HH:mm"))
+    } else {
+      setInputValue("")
     }
   }
 
@@ -71,8 +77,8 @@ export function DurationPicker({
   function handleCalendarDateSelect(selected: Date | undefined) {
     if (!selected) return
     const newDate = new Date(selected)
-    newDate.setHours(endsAt.getHours())
-    newDate.setMinutes(endsAt.getMinutes())
+    newDate.setHours(endsAt?.getHours() ?? 0)
+    newDate.setMinutes(endsAt?.getMinutes() ?? 0)
     newDate.setSeconds(0)
     newDate.setMilliseconds(0)
     onEndsAtChange(newDate)
@@ -80,7 +86,7 @@ export function DurationPicker({
   }
 
   function handleCalendarTimeChange(type: "hour" | "minute", val: number) {
-    const newDate = new Date(endsAt)
+    const newDate = endsAt ? new Date(endsAt) : new Date()
     if (type === "hour") newDate.setHours(val)
     else newDate.setMinutes(val)
     newDate.setSeconds(0)
@@ -89,8 +95,8 @@ export function DurationPicker({
     setInputValue(format(newDate, "yyyy-MM-dd HH:mm"))
   }
 
-  const currentMinutes = differenceInMinutes(endsAt, new Date())
-  const isValidPreset = PRESETS.some((p) => p.minutes === currentMinutes)
+  const currentMinutes = endsAt ? differenceInMinutes(endsAt, new Date()) : null
+  const isValidPreset = currentMinutes !== null && PRESETS.some((p) => p.minutes === currentMinutes)
 
   return (
     <div className="space-y-3">
@@ -121,7 +127,7 @@ export function DurationPicker({
             <div className="sm:flex">
               <Calendar
                 mode="single"
-                selected={endsAt}
+                selected={endsAt ?? undefined}
                 onSelect={handleCalendarDateSelect}
                 initialFocus
                 className="min-w-[17.5rem]"
@@ -139,7 +145,7 @@ export function DurationPicker({
                       key={hour}
                       type="button"
                       size="icon"
-                      variant={endsAt.getHours() === hour ? "default" : "ghost"}
+                      variant={endsAt?.getHours() === hour ? "default" : "ghost"}
                       className="sm:w-full shrink-0 aspect-square"
                       onClick={() => handleCalendarTimeChange("hour", hour)}
                     >
@@ -159,7 +165,7 @@ export function DurationPicker({
                       key={minute}
                       type="button"
                       size="icon"
-                      variant={endsAt.getMinutes() === minute ? "default" : "ghost"}
+                      variant={endsAt?.getMinutes() === minute ? "default" : "ghost"}
                       className="sm:w-full shrink-0 aspect-square"
                       onClick={() => handleCalendarTimeChange("minute", minute)}
                     >
@@ -174,22 +180,24 @@ export function DurationPicker({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {PRESETS.map(({ minutes, label }) => (
+        {PRESETS.map(({ minutes: presetMin, label }) => (
           <Button
-            key={minutes}
+            key={presetMin}
             type="button"
-            variant={isValidPreset && differenceInMinutes(endsAt, new Date()) === minutes ? "default" : "outline"}
+            variant={isValidPreset && currentMinutes === presetMin ? "default" : "outline"}
             size="sm"
-            onClick={() => handlePresetClick(minutes)}
+            onClick={() => handlePresetClick(presetMin)}
           >
             {label}
           </Button>
         ))}
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        Ends at: {format(endsAt, "MMM d, yyyy HH:mm")}
-      </p>
+      {endsAt && (
+        <p className="text-xs text-muted-foreground">
+          Ends at: {format(endsAt, "MMM d, yyyy HH:mm")}
+        </p>
+      )}
     </div>
   )
 }
