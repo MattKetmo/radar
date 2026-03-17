@@ -21,9 +21,7 @@ const PRESETS = [
   { minutes: 60, label: "1h" },
   { minutes: 120, label: "2h" },
   { minutes: 240, label: "4h" },
-  { minutes: 480, label: "8h" },
   { minutes: 1440, label: "1d" },
-  { minutes: 4320, label: "3d" },
 ] as const
 
 type DurationPickerProps = {
@@ -99,7 +97,7 @@ export function DurationPicker({
     <div className="space-y-3">
       <span className="text-sm font-medium">Duration</span>
 
-      <div className="relative flex items-center">
+      <div className="relative flex items-center max-w-64">
         <input
           type="text"
           placeholder="e.g. 2h, in 2 days, 30m"
