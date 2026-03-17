@@ -12,7 +12,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { parseDurationInput } from "@/lib/duration-parser"
 
 const PRESETS = [
@@ -127,41 +126,47 @@ export function DurationPicker({
                 initialFocus
                 className="min-w-[17.5rem]"
               />
-              <div className="flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x">
-                <ScrollArea className="w-64 sm:w-auto">
-                  <div className="flex sm:flex-col p-2">
-                    {hours.map((hour) => (
-                      <Button
-                        key={hour}
-                        type="button"
-                        size="icon"
-                        variant={endsAt.getHours() === hour ? "default" : "ghost"}
-                        className="sm:w-full shrink-0 aspect-square"
-                        onClick={() => handleCalendarTimeChange("hour", hour)}
-                      >
-                        {hour}
-                      </Button>
-                    ))}
-                  </div>
-                  <ScrollBar orientation="horizontal" className="sm:hidden" />
-                </ScrollArea>
-                <ScrollArea className="w-64 sm:w-auto">
-                  <div className="flex sm:flex-col p-2">
-                    {minutes.map((minute) => (
-                      <Button
-                        key={minute}
-                        type="button"
-                        size="icon"
-                        variant={endsAt.getMinutes() === minute ? "default" : "ghost"}
-                        className="sm:w-full shrink-0 aspect-square"
-                        onClick={() => handleCalendarTimeChange("minute", minute)}
-                      >
-                        {String(minute).padStart(2, "0")}
-                      </Button>
-                    ))}
-                  </div>
-                  <ScrollBar orientation="horizontal" className="sm:hidden" />
-                </ScrollArea>
+              <div className="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x">
+                <div
+                  className="flex sm:flex-col p-2 overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:h-[300px]"
+                  onWheel={(e) => {
+                    e.currentTarget.scrollTop += e.deltaY
+                    e.stopPropagation()
+                  }}
+                >
+                  {hours.map((hour) => (
+                    <Button
+                      key={hour}
+                      type="button"
+                      size="icon"
+                      variant={endsAt.getHours() === hour ? "default" : "ghost"}
+                      className="sm:w-full shrink-0 aspect-square"
+                      onClick={() => handleCalendarTimeChange("hour", hour)}
+                    >
+                      {hour}
+                    </Button>
+                  ))}
+                </div>
+                <div
+                  className="flex sm:flex-col p-2 overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:h-[300px]"
+                  onWheel={(e) => {
+                    e.currentTarget.scrollTop += e.deltaY
+                    e.stopPropagation()
+                  }}
+                >
+                  {minutes.map((minute) => (
+                    <Button
+                      key={minute}
+                      type="button"
+                      size="icon"
+                      variant={endsAt.getMinutes() === minute ? "default" : "ghost"}
+                      className="sm:w-full shrink-0 aspect-square"
+                      onClick={() => handleCalendarTimeChange("minute", minute)}
+                    >
+                      {String(minute).padStart(2, "0")}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
           </PopoverContent>
