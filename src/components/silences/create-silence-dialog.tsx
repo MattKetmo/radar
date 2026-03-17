@@ -53,9 +53,7 @@ export function CreateSilenceDialog() {
     { name: "", value: "", operator: "=" },
   ])
   const [startsAt, setStartsAt] = useState(() => new Date())
-  const [endsAt, setEndsAt] = useState(
-    () => new Date(Date.now() + 60 * 60 * 1000)
-  )
+  const [endsAt, setEndsAt] = useState<Date | null>(null)
   const [author, setAuthor] = useState("")
   const [comment, setComment] = useState("")
   const [silenceId, setSilenceId] = useState<string | undefined>(undefined)
@@ -113,15 +111,8 @@ export function CreateSilenceDialog() {
           : [{ name: "", value: "", operator: "=" as MatcherOperator }]
       )
 
-      if (prefillData.durationMode === "custom") {
-        setStartsAt(prefillData.customStartsAt)
-        setEndsAt(prefillData.customEndsAt)
-      } else {
-        setStartsAt(now)
-        setEndsAt(
-          new Date(now.getTime() + prefillData.durationPreset * 60 * 1000)
-        )
-      }
+      setStartsAt(prefillData.startsAt)
+      setEndsAt(prefillData.endsAt)
 
       setAuthor(
         prefillData.author ||
@@ -138,7 +129,7 @@ export function CreateSilenceDialog() {
       )
       setMatchers([{ name: "", value: "", operator: "=" as MatcherOperator }])
       setStartsAt(now)
-      setEndsAt(new Date(now.getTime() + 60 * 60 * 1000))
+      setEndsAt(null)
       setAuthor(localStorage.getItem(LOCAL_STORAGE_AUTHOR_KEY) || "")
       setComment("")
       setSilenceId(undefined)
@@ -174,6 +165,11 @@ export function CreateSilenceDialog() {
 
     if (!comment.trim()) {
       toast.error("Comment is required")
+      return
+    }
+
+    if (!endsAt) {
+      toast.error("Select a duration")
       return
     }
 
@@ -396,7 +392,6 @@ export function CreateSilenceDialog() {
             <DurationPicker
               startsAt={startsAt}
               endsAt={endsAt}
-              onStartsAtChange={setStartsAt}
               onEndsAtChange={setEndsAt}
             />
           </fieldset>
@@ -438,7 +433,7 @@ export function CreateSilenceDialog() {
           <Button
             type="button"
             onClick={handleSubmit}
-            disabled={isSubmitting}
+            disabled={isSubmitting || !endsAt}
           >
             {isSubmitting && (
               <LoaderCircle className="animate-spin" />
