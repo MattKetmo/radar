@@ -5,136 +5,104 @@ import { addMinutes, format, differenceInMinutes } from "date-fns"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { DateTimePicker } from "@/components/ui/date-time-picker"
+import { parseDurationInput } from "@/lib/duration-parser"
 
 const PRESETS = [
+  { minutes: 15, label: "15m" },
   { minutes: 30, label: "30m" },
   { minutes: 60, label: "1h" },
   { minutes: 120, label: "2h" },
   { minutes: 240, label: "4h" },
   { minutes: 480, label: "8h" },
   { minutes: 1440, label: "1d" },
+  { minutes: 4320, label: "3d" },
 ] as const
-
-function formatDuration(minutes: number): string {
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  if (h === 0) return `${m}m`
-  if (m === 0) return `${h}h`
-  return `${h}h ${m}m`
-}
 
 type DurationPickerProps = {
   startsAt: Date
   endsAt: Date
-  onStartsAtChange: (date: Date) => void
   onEndsAtChange: (date: Date) => void
 }
 
 export function DurationPicker({
-  startsAt,
+  startsAt: _startsAt,
   endsAt,
-  onStartsAtChange,
   onEndsAtChange,
 }: DurationPickerProps) {
-  const [mode, setMode] = useState<"preset" | "custom">("preset")
+  const [inputValue, setInputValue] = useState(
+    format(endsAt, "dd MMM yyyy, HH:mm")
+  )
 
-  const currentPreset = differenceInMinutes(endsAt, startsAt)
-  const isValidPreset = PRESETS.some((p) => p.minutes === currentPreset)
-
-  function handlePresetChange(value: string) {
-    if (!value) return
-    const minutes = Number(value)
-    onEndsAtChange(addMinutes(startsAt, minutes))
+  function handlePresetClick(minutes: number) {
+    const newDate = addMinutes(new Date(), minutes)
+    onEndsAtChange(newDate)
+    setInputValue(format(newDate, "dd MMM yyyy, HH:mm"))
   }
 
-  const durationMinutes = differenceInMinutes(endsAt, startsAt)
-  const isEndBeforeStart = durationMinutes <= 0
-
-  if (mode === "custom") {
-    return (
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Duration</span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="xs"
-            onClick={() => setMode("preset")}
-          >
-            Presets
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <label className="text-xs text-muted-foreground">Start</label>
-            <input
-              type="datetime-local"
-              value={format(startsAt, "yyyy-MM-dd'T'HH:mm")}
-              onChange={(e) => onStartsAtChange(new Date(e.target.value))}
-              className="flex h-9 w-full rounded-md border border-input bg-background px-2 py-1 text-sm ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs text-muted-foreground">End</label>
-            <input
-              type="datetime-local"
-              value={format(endsAt, "yyyy-MM-dd'T'HH:mm")}
-              onChange={(e) => onEndsAtChange(new Date(e.target.value))}
-              className={cn(
-                "flex h-9 w-full rounded-md border bg-background px-2 py-1 text-sm ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                isEndBeforeStart
-                  ? "border-destructive"
-                  : "border-input",
-              )}
-            />
-          </div>
-        </div>
-
-        {isEndBeforeStart ? (
-          <p className="text-xs text-destructive">
-            End time must be after start time
-          </p>
-        ) : (
-          <p className="text-xs text-muted-foreground">
-            Duration: {formatDuration(durationMinutes)}
-          </p>
-        )}
-      </div>
-    )
+  function handleInputChange(value: string) {
+    setInputValue(value)
   }
+
+  function handleInputBlur() {
+    const parsed = parseDurationInput(inputValue)
+    if (parsed) {
+      onEndsAtChange(parsed)
+      setInputValue(format(parsed, "dd MMM yyyy, HH:mm"))
+    } else {
+      setInputValue(format(endsAt, "dd MMM yyyy, HH:mm"))
+    }
+  }
+
+  function handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      handleInputBlur()
+    }
+  }
+
+  function handleDateTimeChange(date: Date) {
+    onEndsAtChange(date)
+    setInputValue(format(date, "dd MMM yyyy, HH:mm"))
+  }
+
+  const currentMinutes = differenceInMinutes(endsAt, new Date())
+  const isValidPreset = PRESETS.some((p) => p.minutes === currentMinutes)
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">Duration</span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="xs"
-          onClick={() => setMode("custom")}
-        >
-          Custom
-        </Button>
-      </div>
+      <span className="text-sm font-medium">Duration</span>
 
-      <ToggleGroup
-        type="single"
-        value={isValidPreset ? String(currentPreset) : ""}
-        onValueChange={handlePresetChange}
-        className="justify-start"
-      >
+      <DateTimePicker
+        value={endsAt}
+        onChange={handleDateTimeChange}
+        placeholder="Pick end date and time"
+      />
+
+      <input
+        type="text"
+        placeholder="e.g. 2h, in 2 days, 30m"
+        value={inputValue}
+        onChange={(e) => handleInputChange(e.target.value)}
+        onBlur={handleInputBlur}
+        onKeyDown={handleInputKeyDown}
+        className={cn(
+          "flex h-9 w-full rounded-md border border-input bg-background px-2 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        )}
+      />
+
+      <div className="flex flex-wrap gap-2">
         {PRESETS.map(({ minutes, label }) => (
-          <ToggleGroupItem
+          <Button
             key={minutes}
-            value={String(minutes)}
+            type="button"
+            variant={isValidPreset && differenceInMinutes(endsAt, new Date()) === minutes ? "default" : "outline"}
             size="sm"
+            onClick={() => handlePresetClick(minutes)}
           >
             {label}
-          </ToggleGroupItem>
+          </Button>
         ))}
-      </ToggleGroup>
+      </div>
 
       <p className="text-xs text-muted-foreground">
         Ends at: {format(endsAt, "MMM d, yyyy HH:mm")}

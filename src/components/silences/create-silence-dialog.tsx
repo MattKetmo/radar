@@ -389,7 +389,6 @@ export function CreateSilenceDialog() {
             <DurationPicker
               startsAt={startsAt}
               endsAt={endsAt}
-              onStartsAtChange={setStartsAt}
               onEndsAtChange={setEndsAt}
             />
           </fieldset>
