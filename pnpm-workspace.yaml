@@ -3,3 +3,5 @@ allowBuilds:
   msw: false
   sharp: false
   unrs-resolver: false
+minimumReleaseAgeExclude:
+  - lucide-react@1.32.0

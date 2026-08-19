@@ -129,7 +129,7 @@ export function DurationPicker({
                 mode="single"
                 selected={endsAt ?? undefined}
                 onSelect={handleCalendarDateSelect}
-                initialFocus
+                autoFocus
                 className="min-w-[17.5rem]"
               />
               <div className="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x">
