@@ -70,7 +70,7 @@ export const memoize = <T extends (...args: any[]) => Promise<any>>(fn: T) => {
 }
 
 
-export const deepMerge = <T extends { [key: string]: any }>(target: T, source: T): T => {
+export const deepMerge = <T extends { [key: string]: any }, S extends { [key: string]: any } = T>(target: T, source: S): T & S => {
   const result = { ...target } as Record<string, any>;
   for (const key of Object.keys(source)) {
     if (source[key] !== undefined) {
@@ -81,5 +81,5 @@ export const deepMerge = <T extends { [key: string]: any }>(target: T, source: T
       }
     }
   }
-  return result as T;
+  return result as T & S;
 };
