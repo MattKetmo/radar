@@ -1,7 +1,56 @@
+# Supply-chain security settings.
+# See https://pnpm.io/blog/2025-12-05-newsroom-npm-supply-chain-security
+
+# Require a package version to be published for at least 7 days before it
+# can be installed, and fail (rather than silently fall back) when no
+# version in range satisfies that.
+minimumReleaseAge: 10080
+minimumReleaseAgeStrict: true
+# Registries that omit the `time` field also fail the check instead of
+# being let through.
+minimumReleaseAgeIgnoreMissingTime: false
+# Packages exempted from minimumReleaseAge (e.g. versions vetted manually).
+minimumReleaseAgeExclude:
+  - lucide-react@1.32.0
+
+# Refuse to install a package with weaker publish auth than previously used.
+trustPolicy: no-downgrade
+# Packages vetted manually despite a flagged trust downgrade.
+trustPolicyExclude:
+  # 3.10.1 (2025-04-21) is a backport patch on the old 3.x line published
+  # without provenance while 4.x had moved ahead; official import-js repo,
+  # no reported incident.
+  - eslint-import-resolver-typescript@3.10.1
+  # 6.3.1 (2023-07-10) is a maintenance backport on the old 6.x line from
+  # the official npm/node-semver core team, published without provenance
+  # while 7.x was already the main line; no reported incident.
+  - semver@6.3.1
+  # 1.0.41 (2025-08-19) is a legacy-branch backport (dist-tag "legacy")
+  # published by the original faisalman maintainer alongside 0.7.41 and
+  # 2.x, without provenance; no reported incident (unlike the 2021
+  # ua-parser-js compromise, which was on different versions/maintainer
+  # access — checked specifically given that history).
+  - ua-parser-js@1.0.41
+# Re-verify minimumReleaseAge/trustPolicy against the lockfile on every
+# install rather than trusting it as-is.
+trustLockfile: false
+
+# Only direct dependencies may use exotic sources (git+ssh, raw tarball
+# URLs, ...) — never transitive ones.
+blockExoticSubdeps: true
+
+# Fail install on unreviewed lifecycle (install) scripts instead of
+# running them silently.
+strictDepBuilds: true
+dangerouslyAllowAllBuilds: false
+# Packages allowed to run install/build scripts despite strictDepBuilds —
+# set to false to keep them blocked (documents the review, doesn't grant it).
 allowBuilds:
   esbuild: false
   msw: false
   sharp: false
   unrs-resolver: false
-minimumReleaseAgeExclude:
-  - lucide-react@1.32.0
+
+# Minimum severity that fails `pnpm audit`.
+audit:
+  level: high

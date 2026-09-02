@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "deps:check": "pnpm outdated; pnpm install --frozen-lockfile",
+    "deps:update": "pnpm update -i -L",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -62,7 +64,7 @@
     "@vitejs/plugin-react": "^6.0.5",
     "concurrently": "^10.0.5",
     "eslint": "^10.8.1",
-    "eslint-config-next": "16.3.1",
+    "eslint-config-next": "16.3.3",
     "jsdom": "^30.0.1",
     "msw": "^2",
     "postcss": "^8.5.26",
