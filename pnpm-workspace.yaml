@@ -12,6 +12,8 @@ minimumReleaseAgeIgnoreMissingTime: false
 # Packages exempted from minimumReleaseAge (e.g. versions vetted manually).
 minimumReleaseAgeExclude:
   - lucide-react@1.32.0
+  # Renovate security update: zod@4.6.6
+  - zod@4.6.6
 
 # Refuse to install a package with weaker publish auth than previously used.
 trustPolicy: no-downgrade
