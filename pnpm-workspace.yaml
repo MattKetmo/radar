@@ -2,10 +2,11 @@
 # See https://pnpm.io/blog/2025-12-05-newsroom-npm-supply-chain-security
 
 # Require a package version to be published for at least 7 days before it
-# can be installed, and fail (rather than silently fall back) when no
-# version in range satisfies that.
+# can be installed. Non-strict: fall back to an older version in range that
+# satisfies the age instead of failing (strict mode breaks Renovate, which
+# runs pnpm with --no-save and can't persist minimumReleaseAgeExclude).
 minimumReleaseAge: 10080
-minimumReleaseAgeStrict: true
+minimumReleaseAgeStrict: false
 # Registries that omit the `time` field also fail the check instead of
 # being let through.
 minimumReleaseAgeIgnoreMissingTime: false
